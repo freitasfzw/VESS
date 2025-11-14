@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!doctype html>
 <html lang="pt-BR">
 
@@ -414,4 +415,1652 @@
 
 </body>
 
+=======
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fluxo de Caixa — Loja</title>
+    <!-- Dependências opcionais via CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.3/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg: #f5f7ff;
+            --card: #ffffff;
+            --muted: #6b7280;
+            --text: #1e293b;
+            --accent: #3a86ff;
+            --accent-2: #00b4d8;
+            --ok: #2ecc71;
+            --warn: #f39c12;
+            --danger: #e74c3c;
+            --radius: 12px;
+            --shadow: 0 4px 15px rgba(0, 0, 0, .1);
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            background: linear-gradient(180deg, #e8ecff 0%, #f5f7ff 100%);
+            font-family: Inter, system-ui, Segoe UI, Roboto, Helvetica, Arial;
+            color: var(--text)
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(255, 255, 255, .85);
+            backdrop-filter: saturate(120%) blur(8px);
+            border-bottom: 1px solid rgba(0, 0, 0, .08)
+        }
+
+        .wrap {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px
+        }
+
+        .brand {
+            display: flex;
+            gap: 12px;
+            align-items: center
+        }
+
+        .brand .logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            box-shadow: var(--shadow)
+        }
+
+        nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px
+        }
+
+        .tab-btn {
+            border: none;
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: #eef2ff;
+            color: var(--muted);
+            cursor: pointer
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            color: #ffffff
+        }
+
+        main {
+            padding: 24px 0
+        }
+
+
+
+        @media(min-width:900px) {
+            .grid {
+                grid-template-columns: 1.2fr .8fr
+            }
+        }
+
+        .card {
+            background: linear-gradient(180deg, #ffffff, #f1f4ff);
+            border: 1px solid rgba(0, 0, 0, .06);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow)
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid rgba(0, 0, 0, .06)
+        }
+
+        .card-content {
+            padding: 16px
+        }
+
+        h1,
+        h2,
+        h3 {
+            margin: 0 0 8px 0
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        td,
+        tr {
+            color: var(--text);
+        }
+
+        .muted {
+            color: var(--muted);
+            font-size: .95rem
+        }
+
+        .row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap
+        }
+
+        .row>* {
+            flex: 1
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px 12px;
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, .1);
+            border-radius: 12px;
+            color: var(--text);
+            outline: none
+        }
+
+        input::placeholder {
+            color: #9ba3b0
+        }
+
+        label {
+            font-size: .9rem;
+            color: #334155
+        }
+
+        button {
+            appearance: none;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            color: #ffffff;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: var(--shadow)
+        }
+
+        button.ghost {
+            background: #f0f2ff;
+            color: var(--muted)
+        }
+
+        button.danger {
+            background: linear-gradient(135deg, #e74c3c, #ff7675);
+            color: #ffffff
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden
+        }
+
+        th,
+        td {
+            padding: 10px;
+            border-bottom: 1px solid rgba(0, 0, 0, .05);
+            text-align: left
+        }
+
+        th {
+            background: #f2f4ff;
+            color: #374151
+        }
+
+        tr:hover td {
+            background: #f8faff
+        }
+
+        .right {
+            text-align: right
+        }
+
+        .pill {
+            padding: 4px 8px;
+            border-radius: 999px;
+            background: #eef2ff;
+            color: #334155;
+            font-size: .8rem
+        }
+
+        .status-ok {
+            background: rgba(46, 204, 113, .15);
+            color: #2ecc71
+        }
+
+        .status-warn {
+            background: rgba(243, 156, 18, .15);
+            color: #f39c12
+        }
+
+        .status-danger {
+            background: rgba(231, 76, 60, .15);
+            color: #e74c3c
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap
+        }
+
+        .section {
+            display: none
+        }
+
+        .section.active {
+            display: block
+        }
+
+        /* Switch (checkbox estilizado) */
+        .switch {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .switch input {
+            display: none
+        }
+
+        .switch .track {
+            width: 48px;
+            height: 26px;
+            background: #e0e7ff;
+            border-radius: 999px;
+            position: relative;
+            transition: .25s
+        }
+
+        .switch .thumb {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            top: 2px;
+            left: 2px;
+            background: white;
+            border-radius: 50%;
+            transition: .25s
+        }
+
+        .switch input:checked+.track {
+            background: linear-gradient(135deg, var(--accent), var(--accent-2))
+        }
+
+        .switch input:checked+.track .thumb {
+            transform: translateX(22px)
+        }
+
+        /* Toast popup */
+        #popup {
+            position: fixed;
+            left: 50%;
+            bottom: 18px;
+            transform: translateX(-50%);
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, .1);
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: #1e293b;
+            opacity: 0;
+            visibility: hidden;
+            transition: .3s;
+            z-index: 1000;
+            box-shadow: var(--shadow)
+        }
+
+        #popup.show {
+            opacity: 1;
+            visibility: visible
+        }
+
+        .kbd {
+            background: #f3f4f6;
+            border: 1px solid rgba(0, 0, 0, .08);
+            padding: 2px 6px;
+            border-radius: 6px
+        }
+
+        .danger-text {
+            color: #e74c3c
+        }
+
+        .user-panel {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #1e293b;
+            padding: 10px 16px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: Inter, system-ui, sans-serif;
+            font-weight: 500;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .user-panel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        #btnLogout {
+            border: none;
+            color: #fff;
+            border-radius: 12px;
+            padding: 6px 10px;
+            cursor: pointer;
+            font-size: 16px;
+            background: #dc3545;
+            transition: all 0.2s ease;
+        }
+
+        #btnLogout:hover {
+            background: #c0392b;
+            transform: translateY(-1px);
+        }
+
+        /* Container */
+        #relatorio-container {
+            margin-top: 15px;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            color: #333;
+        }
+
+        /* Cards em grid */
+        .rel-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .rel-card {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            padding: 15px;
+            transition: transform .2s;
+        }
+
+        .rel-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .rel-card h4 {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 6px;
+        }
+
+        .rel-card p {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 0;
+            color: #222;
+        }
+
+        /* Botões de controle */
+        .rel-toggle {
+            background: #f5f5f5;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            margin: 3px;
+            cursor: pointer;
+            transition: background .2s;
+        }
+
+        .rel-toggle:hover {
+            background: #e0e0e0;
+        }
+
+        .rel-toggle.active {
+            background: #007bff;
+            color: #fff;
+        }
+
+        /* Listas formatadas */
+        .rel-list {
+            background: #fafafa;
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin-bottom: 20px;
+        }
+
+        .rel-list h3 {
+            font-size: 1rem;
+            margin: 10px 0;
+            color: #444;
+        }
+
+        .rel-list ol,
+        .rel-list ul {
+            padding-left: 18px;
+            margin: 0;
+        }
+
+        .rel-list li {
+            margin: 5px 0;
+        }
+
+        /* 🔒 Estado bloqueado geral */
+        body.bloqueado {
+            filter: blur(6px);
+            pointer-events: none;
+            user-select: none;
+            transition: filter 0.4s ease;
+        }
+
+        /* ✨ Remove o blur da aba financeiro */
+        body.bloqueado #financeiro {
+            filter: none !important;
+            pointer-events: auto !important;
+            user-select: auto !important;
+        }
+
+        /* 💳 Adiciona destaque para a seção financeira visível */
+        body.bloqueado #financeiro {
+            position: relative;
+            z-index: 10;
+            backdrop-filter: none;
+        }
+
+        /* 🔒 Adiciona um overlay sem bloquear o financeiro */
+        body.bloqueado::after {
+            content: "🔒 Acesso bloqueado — regularize sua assinatura para continuar.";
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.75);
+            color: #fff;
+            padding: 10px 24px;
+            border-radius: 8px;
+            z-index: 999;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="wrap">
+            <div class="brand">
+                <div class="logo"></div>
+                <div>
+                    <h2>Fluxo de Caixa — Loja</h2>
+                    <div class="muted">POS + Estoque + NF (simulada) + Relatórios</div>
+                </div>
+            </div>
+            <nav id="tabs"></nav>
+        </div>
+    </header>
+
+    <main class="wrap">
+        <div class="grid">
+            <div>
+                <!-- Seções da coluna principal -->
+                <section id="sec-pos" class="card section active">
+                    <div class="card-header">
+                        <h3>PDV / Vendas</h3>
+                        <div class="toolbar">
+                            <button class="ghost" id="btnStartScan">Escanear Código (Câmera)</button>
+                            <button class="ghost" id="btnStopScan">Parar Câmera</button>
+                            <button id="btnNovaVenda">Nova venda</button>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="row">
+                            <div>
+                                <label>Código de barras</label>
+                                <input id="pos-barcode" placeholder="Escaneie ou digite..." />
+                            </div>
+                            <div>
+                                <label>Quantidade</label>
+                                <input id="pos-qtd" type="number" min="1" value="1" />
+                            </div>
+                            <div>
+                                <label>&nbsp;</label>
+                                <button id="pos-add">Adicionar ao carrinho</button>
+                            </div>
+                        </div>
+
+                        <div id="scanner"
+                            style="margin-top:12px;display:none;border:1px dashed rgba(255,255,255,.15);border-radius:12px;overflow:hidden">
+                        </div>
+
+                        <h3 style="margin-top:16px">Carrinho</h3>
+                        <table id="pos-cart">
+                            <thead>
+                                <tr>
+                                    <th>Produto</th>
+                                    <th class="right">Preço</th>
+                                    <th class="right">Qtd</th>
+                                    <th class="right">Subtotal</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="3" class="right">Desconto (R$)</th>
+                                    <td class="right"><input id="pos-desconto" type="number" step="0.01" value="0"></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th colspan="3" class="right">Total</th>
+                                    <th class="right" id="pos-total">R$ 0,00</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                        <div class="row" style="margin-top:10px">
+                            <div>
+                                <label>Cliente (opcional)</label>
+                                <input id="pos-cliente" placeholder="Nome do cliente" />
+                            </div>
+                            <div>
+                                <label>Forma de pagamento</label>
+                                <select id="pos-pagto">
+                                    <option>Dinheiro</option>
+                                    <option>Cartão Débito</option>
+                                    <option>Cartão Crédito</option>
+                                    <option>Pix</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Emitir Nota Fiscal (simulada)</label>
+                                <label class="switch"><input id="pos-nf" type="checkbox"><span class="track"><span
+                                            class="thumb"></span></span></label>
+                            </div>
+                            <div style="align-self:end;text-align:right">
+                                <button id="pos-finalizar">Finalizar Venda</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="sec-estoque" class="card section">
+                    <div class="card-header">
+                        <h3>Produtos & Estoque</h3>
+                        <div class="toolbar">
+                            <button id="btnNovoProduto">Novo Produto</button>
+                            <button class="ghost" id="btnImportar">Importar JSON</button>
+                            <button class="ghost" id="btnExportar">Exportar JSON</button>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="row">
+                            <div><label>Busca</label><input id="buscaProduto" placeholder="Nome, código ou categoria" />
+                            </div>
+                            <div><label>Categoria</label><input id="filtroCategoria" placeholder="ex.: Acessórios" />
+                            </div>
+                        </div>
+
+                        <table id="tblProdutos" style="margin-top:12px">
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Nome</th>
+                                    <th>Categoria</th>
+                                    <th class="right">Custo</th>
+                                    <th class="right">Preço</th>
+                                    <th class="right">Estoque</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="sec-caixa" class="card section">
+                    <div class="card-header">
+                        <h3>Fluxo de Caixa</h3>
+                        <div class="toolbar">
+                            <button id="btnLancamento">Novo Lançamento</button>
+                            <button class="ghost" id="btnFechamento">Fechar Caixa do Dia</button>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="row">
+                            <div>
+                                <label>Período</label>
+                                <div class="row">
+                                    <input type="date" id="cx-inicio" />
+                                    <input type="date" id="cx-fim" />
+                                    <button class="ghost" id="cx-aplicar">Aplicar</button>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="pill status-ok" id="cx-saldo">Saldo: R$ 0,00</div>
+                            </div>
+                        </div>
+
+                        <table id="tblCaixa" style="margin-top:12px">
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Descrição</th>
+                                    <th>Categoria</th>
+                                    <th class="right">Entrada</th>
+                                    <th class="right">Saída</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="sec-relatorios" class="section" style="display:none">
+                    <div style="margin:10px 0">
+                        <input type="date" id="rel-inicio"> até
+                        <input type="date" id="rel-fim">
+                        <button id="rel-aplicar">Gerar Relatório</button>
+                        <button id="rel-exportar">Exportar CSV</button>
+                        <button id="rel-expandir">Expandir</button>
+                    </div>
+                    <div id="relatorio-container"></div>
+                </section>
+
+                <section id="sec-fechamentos" class="card section" style="display:none">
+                    <div class="card-header">
+                        <h3>Fechamentos</h3>
+                        <div class="toolbar">
+                            <button class="ghost" id="btnAbrirCaixa" title="Abrir caixa para novo dia"
+                                style="background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: var(--bg);">Abrir
+                                Caixa</button>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <table id="tblFechamentos">
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th class="right">Vendas</th>
+                                    <th class="right">Saídas</th>
+                                    <th class="right">Lucro Líquido</th>
+                                    <th class="right">Retirado</th>
+                                    <th class="right">Troco p/ Próx. Dia</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+
+        </div>
+    </main>
+
+    <!-- =============== PopUp =============== -->
+    <div id="popup"></div>
+
+    <!-- =============== Dialogs / Modais =============== -->
+    <!-- Dialog: Fechamento do Dia (bloqueante) -->
+    <dialog id="dlgFechamentoDia">
+        <form method="dialog" class="card"
+            style="min-width:360px;background:#0c1536;border:1px solid rgba(255,255,255,.06);border-radius:16px">
+            <div class="card-header">
+                <h3>Fechamento do Dia</h3>
+            </div>
+            <div class="card-content" id="fech-resumo" style="max-height:55vh;overflow:auto"></div>
+            <div class="card-content">
+                <div class="row">
+                    <div><label>Retirada (R$)</label><input id="fech-retirar" type="number" step="0.01" /></div>
+                    <div><label>Troco p/ amanhã (R$)</label><input id="fech-troco" type="number" step="0.01" /></div>
+                </div>
+            </div>
+            <div class="card-content" style="display:flex;gap:8px;justify-content:flex-end">
+                <button id="fech-confirmar">Confirmar Fechamento</button>
+            </div>
+        </form>
+    </dialog>
+    <!-- Dialog: Detalhe de um Fechamento -->
+    <dialog id="dlgFechDet">
+        <form method="dialog" class="card"
+            style="min-width:420px;max-width:900px;background:#0c1536;border:1px solid rgba(255,255,255,.06);border-radius:16px">
+            <div class="card-header">
+                <h3 id="fechDet-titulo">Fechamento</h3>
+            </div>
+            <div class="card-content" id="fechDet-conteudo" style="max-height:70vh;overflow:auto"></div>
+            <div class="card-content" style="display:flex;gap:8px;justify-content:flex-end">
+                <button class="ghost" value="cancel">Fechar</button>
+            </div>
+        </form>
+    </dialog>
+    <!-- Dialog: Adicionar Produto -->
+    <dialog id="dlgProduto">
+        <form method="dialog" class="card"
+            style="min-width:320px;background:#0c1536;border:1px solid rgba(255,255,255,.06);border-radius:16px">
+            <div class="card-header">
+                <h3 style="color: var(--text);">Produto</h3>
+            </div>
+            <div class="card-content">
+                <div class="row">
+                    <button id="btnScanProduto" type="button">Ler Código de Barras</button>
+                    <div id="scannerProduto" style="display:none; width:100%; height:200px;"></div>
+                    <div><label>Código de barras</label><input id="p-cod" /></div>
+                    <div><label>Nome</label><input id="p-nome" /></div>
+                </div>
+                <div class="row">
+                    <div><label>Categoria</label><input id="p-cat" /></div>
+                    <div><label>Estoque</label><input id="p-estoque" type="number" /></div>
+                </div>
+                <div class="row">
+                    <div><label>Custo (R$)</label><input id="p-custo" type="number" step="0.01" /></div>
+                    <div><label>Preço (R$)</label><input id="p-preco" type="number" step="0.01" /></div>
+                </div>
+            </div>
+            <div class="card-content" style="display:flex;gap:8px;justify-content:flex-end"><button value="cancel"
+                    class="ghost">Cancelar</button><button id="p-salvar" value="default">Salvar</button></div>
+        </form>
+    </dialog>
+    <!-- Dialog: Adicionar Lancamento -->
+    <dialog id="dlgLancamento">
+        <form method="dialog" class="card"
+            style="min-width:320px;background:#0c1536;border:1px solid rgba(255,255,255,.06);border-radius:16px">
+            <div class="card-header">
+                <h3>Novo Lançamento</h3>
+            </div>
+            <div class="card-content">
+                <div class="row">
+                    <div><label>Data</label><input id="l-data" type="date" /></div>
+                    <div><label>Categoria</label><input id="l-cat" placeholder="Aluguel, Energia, etc." /></div>
+                </div>
+                <div class="row">
+                    <div><label>Descrição</label><input id="l-desc" /></div>
+                </div>
+                <div class="row">
+                    <div><label>Tipo</label><select id="l-tipo">
+                            <option value="E">Entrada</option>
+                            <option value="S">Saída</option>
+                        </select></div>
+                    <div><label>Valor (R$)</label><input id="l-valor" type="number" step="0.01" /></div>
+                </div>
+            </div>
+            <div class="card-content" style="display:flex;gap:8px;justify-content:flex-end"><button value="cancel"
+                    class="ghost">Cancelar</button><button id="l-salvar" value="default">Salvar</button></div>
+        </form>
+    </dialog>
+
+    <!-- =============== Painel de usuário =============== -->
+    <div id="userPanel" class="user-panel">
+        <span id="userInfo">Carregando...</span>
+        <button id="btnLogout" title="Sair">🔒</button>
+
+    </div>
+    <!-- =============== FIREBASE =============== -->
+    <script type="module">
+        import { protectPage, logout, getUserName, getUserRole, auth, db } from "./js/auth.js";
+        protectPage();
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+        import { collection, getDocs, doc, getDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+        const userInfoEl = document.getElementById("userInfo");
+        const btnLogout = document.getElementById("btnLogout");
+
+        // Protege a página e retorna o usuário logado
+        const user = await protectPage();
+
+        // Atualiza painel de usuário apenas quando o usuário estiver logado
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                try {
+                    const name = await getUserName();
+                    const role = await getUserRole();
+
+                    userInfoEl.textContent = `${name} - ${role}`;
+                    applyPermissions(role);
+                } catch (err) {
+                    console.error(err);
+                    userInfoEl.textContent = "Erro ao carregar usuário";
+                }
+            } else {
+                userInfoEl.textContent = "Carregando...";
+            }
+        });
+
+        // Logout
+        // =====================
+        btnLogout.addEventListener("click", () => {
+            // Limpa todo o localStorage
+            localStorage.clear();
+
+            // Executa logout do Firebase
+            logout();
+        });
+
+        // =====================
+        // Função de permissões
+        // =====================
+        function applyPermissions(role) {
+            const permissions = {
+                Administrador: ["sec-pos", "sec-estoque", "sec-caixa", "sec-relatorios", "sec-fechamentos", "sec-config", "sec-ajuda"],
+                Gerente: ["sec-pos", "sec-estoque", "sec-caixa", "sec-relatorios"],
+                Caixa: ["sec-pos"]
+            };
+
+            const allowed = permissions[role] || [];
+
+            // Mostra apenas os botões das abas permitidas
+            $$('.tab-btn').forEach(btn => {
+                btn.style.display = allowed.includes(btn.dataset.target) ? 'inline-block' : 'none';
+            });
+
+            // Seleciona a primeira aba permitida
+            const primeiraVisivel = allowed[0];
+            if (primeiraVisivel) selecionarAba(primeiraVisivel);
+        }
+
+        async function syncFirebase() {
+            try {
+                // Produtos
+                const colProdRef = collection(db, "produtos");
+                const prodSnap = await getDocs(colProdRef);
+                const prodIds = state.produtos.map(p => p.id);
+                for (const docF of prodSnap.docs) {
+                    if (!prodIds.includes(docF.id)) await deleteDoc(doc(db, "produtos", docF.id));
+                }
+                for (const p of state.produtos) await setDoc(doc(db, "produtos", p.id), p);
+
+                // Caixa
+                const colCxRef = collection(db, "caixa");
+                const cxSnap = await getDocs(colCxRef);
+                const cxIds = state.caixa.map(c => c.id);
+                for (const docF of cxSnap.docs) {
+                    if (!cxIds.includes(docF.id)) await deleteDoc(doc(db, "caixa", docF.id));
+                }
+                for (const c of state.caixa) await setDoc(doc(db, "caixa", c.id), c);
+
+                // Vendas
+                const colVendasRef = collection(db, "vendas");
+                const vendasSnap = await getDocs(colVendasRef);
+                const vendasIds = state.vendas.map(v => v.id);
+
+                // Deleta vendas que não existem mais localmente
+                for (const docF of vendasSnap.docs) {
+                    if (!vendasIds.includes(docF.id)) await deleteDoc(doc(db, "vendas", docF.id));
+                }
+
+                // Fechamentos
+                const colFechRef = collection(db, "fechamentos");
+                const fechSnap = await getDocs(colFechRef);
+                const fechIds = state.fechamentos.map(f => f.id);
+                for (const docF of fechSnap.docs) {
+                    if (!fechIds.includes(docF.id)) await deleteDoc(doc(db, "fechamentos", docF.id));
+                }
+                for (const f of state.fechamentos) await setDoc(doc(db, "fechamentos", f.id), f);
+
+                // Status do Caixa (documento único)
+                await setDoc(doc(db, "cfg", "caixaStatus"), state.caixaStatus);
+
+                // Atualiza/insere vendas
+                for (const v of state.vendas) await setDoc(doc(db, "vendas", v.id), v);
+
+                // Configurações
+                await setDoc(doc(db, "cfg", "config"), state.cfg);
+
+                mostrarPopup("Dados sincronizados com Firebase!");
+            } catch (err) {
+                console.error("Erro ao sincronizar Firebase:", err);
+                mostrarPopup("Erro ao enviar dados para Firebase");
+            }
+        }
+        // =============== INIT ===============
+        // Função para carregar dados do Firebase
+        async function loadFromFirebase() {
+            try {
+                const collections = ["produtos", "caixa", "vendas", "cfg", "fechamentos"];
+
+                for (const col of collections) {
+                    const colRef = collection(db, col);
+                    const snapshot = await getDocs(colRef);
+
+                    if (col === "cfg") {
+                        const docCfg = snapshot.docs.find(d => d.id === "config");
+                        if (docCfg) {
+                            state.cfg = docCfg.data();
+                            DB.set("cfg", state.cfg);
+                        }
+                    } else {
+                        state[col] = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        DB.set(col, state[col]);
+                    }
+                }
+
+                mostrarPopup("Dados carregados do Firebase!");
+            } catch (err) {
+                console.error("Erro ao carregar dados do Firebase:", err);
+                mostrarPopup("Não foi possível carregar dados do Firebase");
+            }
+        }
+
+        // ================== INIT ==================
+        async function init() {
+            renderTabs();  // renderiza botões de aba antes de aplicar permissões
+
+            // Puxa dados do Firebase antes de renderizar
+            await loadFromFirebase();
+
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    try {
+                        const name = await getUserName();
+                        const role = await getUserRole();
+
+                        userInfoEl.textContent = `${name} - ${role}`;
+                        applyPermissions(role); // aplica permissões após abas renderizadas
+                    } catch (err) {
+                        console.error(err);
+                        userInfoEl.textContent = "Erro ao carregar usuário";
+                    }
+                } else {
+                    userInfoEl.textContent = "Carregando...";
+                }
+            });
+
+            listarProdutos();
+            renderCfg();
+            listarCaixa();
+            atualizarGraficos();
+
+            // atalhos
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'F2') { e.preventDefault(); editarProduto() }
+                if (e.key === 'F9') { e.preventDefault(); $('#pos-finalizar').click() }
+            });
+        }
+        init();
+
+        window.syncFirebase = syncFirebase;
+    </script>
+
+    <script>
+        function atualizarGraficos() {
+            gerarRelatorio(); // ✅ só redireciona para o relatório
+        }
+
+        // =============== UTIL ===============
+        const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+        const $ = (sel, root = document) => root.querySelector(sel);
+        const fmtBRL = (v = 0) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        const uid = () => Math.random().toString(36).slice(2, 9);
+        function mostrarPopup(msg) { const p = $('#popup'); p.textContent = msg; p.classList.add('show'); setTimeout(() => p.classList.remove('show'), 1800) }
+        const sameDay = (iso, base = new Date()) => { const d = new Date(iso), b = new Date(base); return d.getFullYear() === b.getFullYear() && d.getMonth() === b.getMonth() && d.getDate() === b.getDate(); };
+        const dayBounds = (base = new Date()) => {
+            const d0 = new Date(base.getFullYear(), base.getMonth(), base.getDate());
+            const d1 = new Date(base.getFullYear(), base.getMonth(), base.getDate(), 23, 59, 59, 999); return [d0, d1];
+        };
+        const clamp2 = n => Math.round((+n || 0) * 100) / 100;
+        const toBRL = n => fmtBRL(clamp2(n));
+        // =============== STORAGE ===============
+        const DB = {
+            get(key, def) { try { return JSON.parse(localStorage.getItem(key)) ?? def } catch { return def } },
+            set(key, val) { localStorage.setItem(key, JSON.stringify(val)) }
+        }
+
+        // Estruturas principais
+        const state = {
+            produtos: DB.get('produtos', []),
+            caixa: DB.get('caixa', []),
+            vendas: DB.get('vendas', []),
+            cfg: DB.get('cfg', { nome: 'Minha Loja', cnpj: '', ie: '', endereco: '', icms: 0, iss: 0, controlaEstoque: true }),
+            fechamentos: DB.get('fechamentos', []), // histórico de fechamentos
+            caixaStatus: DB.get('caixaStatus', { aberto: true, trocoProximoDia: 0, abertoEm: null, fechadoEm: null })
+        };
+
+        // =============== NAV/TABS ===============
+        const abas = [
+            { id: 'sec-pos', label: 'PDV' },
+            { id: 'sec-estoque', label: 'Estoque' },
+            { id: 'sec-caixa', label: 'Fluxo de Caixa' },
+            { id: 'sec-relatorios', label: 'Relatórios' },
+            { id: 'sec-fechamentos', label: 'Fechamentos' },
+        ];
+        function renderTabs() { const nav = $('#tabs'); nav.innerHTML = ''; abas.forEach(a => { const b = document.createElement('button'); b.className = 'tab-btn'; b.textContent = a.label; b.dataset.target = a.id; b.onclick = () => selecionarAba(a.id); nav.appendChild(b) }); selecionarAba('sec-pos') }
+        function selecionarAba(id) {
+            $$('.section').forEach(s => s.style.display = 'none'); // esconde todas
+            const sec = $('#' + id);
+            if (!sec) return;
+
+            sec.style.display = 'block'; // mostra apenas a ativa
+            $$('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.target === id));
+
+            if (id === 'sec-relatorios') atualizarGraficos();
+            if (id === 'sec-fechamentos') listarFechamentos();
+            if (id === 'sec-caixa') listarCaixa();
+            if (id === 'sec-estoque') listarProdutos();
+        }
+        // =============== ESTOQUE ===============
+        function listarProdutos() { const tbody = $('#tblProdutos tbody'); const q = $('#buscaProduto').value.toLowerCase(); const cat = $('#filtroCategoria').value.toLowerCase(); tbody.innerHTML = ''; state.produtos.filter(p => (p.nome.toLowerCase().includes(q) || p.codigo.toLowerCase().includes(q) || p.categoria.toLowerCase().includes(q)) && (cat ? p.categoria.toLowerCase().includes(cat) : true)).forEach(p => { const tr = document.createElement('tr'); tr.innerHTML = `<td>${p.codigo}</td><td>${p.nome}</td><td>${p.categoria}</td><td class='right'>${fmtBRL(+p.custo || 0)}</td><td class='right'>${fmtBRL(+p.preco || 0)}</td><td class='right'>${p.estoque ?? 0}</td><td class='right'><button class='ghost' onclick="editarProduto('${p.id}')">Editar</button> <button class='danger' onclick="excluirProduto('${p.id}')">Excluir</button></td>`; tbody.appendChild(tr) }) }
+
+        function editarProduto(id) { const p = state.produtos.find(x => x.id === id) || { id: uid(), codigo: '', nome: '', categoria: '', estoque: 0, custo: 0, preco: 0 }; $('#p-cod').value = p.codigo; $('#p-nome').value = p.nome; $('#p-cat').value = p.categoria; $('#p-estoque').value = p.estoque; $('#p-custo').value = p.custo; $('#p-preco').value = p.preco; $('#p-salvar').onclick = (e) => { e.preventDefault(); p.codigo = $('#p-cod').value.trim(); p.nome = $('#p-nome').value.trim(); p.categoria = $('#p-cat').value.trim(); p.estoque = +$('#p-estoque').value || 0; p.custo = +$('#p-custo').value || 0; p.preco = +$('#p-preco').value || 0; const i = state.produtos.findIndex(x => x.id === p.id); if (i >= 0) state.produtos[i] = p; else state.produtos.push(p); DB.set('produtos', state.produtos); syncFirebase(); $('#dlgProduto').close(); listarProdutos(); mostrarPopup('Produto salvo!') }; $('#dlgProduto').showModal() }
+        function excluirProduto(id) { if (!confirm('Excluir produto?')) return; state.produtos = state.produtos.filter(p => p.id !== id); DB.set('produtos', state.produtos); listarProdutos(); mostrarPopup('Produto excluído') }
+
+        // Import/Export
+        $('#btnExportar')?.addEventListener('click', () => { const data = { produtos: state.produtos, caixa: state.caixa, vendas: state.vendas, cfg: state.cfg }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'loja-dados.json'; a.click(); URL.revokeObjectURL(a.href) });
+        $('#btnImportar')?.addEventListener('click', () => { const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'application/json'; inp.onchange = () => { const f = inp.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { try { const data = JSON.parse(r.result); state.produtos = data.produtos || []; state.caixa = data.caixa || []; state.vendas = data.vendas || []; state.cfg = data.cfg || state.cfg; DB.set('produtos', state.produtos); DB.set('caixa', state.caixa); DB.set('vendas', state.vendas); DB.set('cfg', state.cfg); syncFirebase(); listarProdutos(); listarCaixa(); mostrarPopup('Dados importados!') } catch (e) { alert('Arquivo inválido') } }; r.readAsText(f) }; inp.click() });
+        $('#btnNovoProduto')?.addEventListener('click', () => editarProduto());
+        $('#buscaProduto')?.addEventListener('input', listarProdutos);
+        $('#filtroCategoria')?.addEventListener('input', listarProdutos);
+
+        // =============== PDV ===============
+        const carrinho = [];
+        function addCarrinho(codigo, qtd) { const p = state.produtos.find(x => x.codigo === codigo); if (!p) { mostrarPopup('Produto não encontrado'); return } const item = carrinho.find(i => i.codigo === codigo); if (item) item.qtd += qtd; else carrinho.push({ codigo, nome: p.nome, preco: +p.preco || 0, qtd }); renderCarrinho() }
+        function renderCarrinho() { const tb = $('#pos-cart tbody'); tb.innerHTML = ''; let total = 0; carrinho.forEach((i, idx) => { const sub = i.preco * i.qtd; total += sub; const tr = document.createElement('tr'); tr.innerHTML = `<td>${i.nome}</td><td class='right'>${fmtBRL(i.preco)}</td><td class='right'><input type='number' min='1' value='${i.qtd}' style='width:70px' data-idx='${idx}' class='qtd'></td><td class='right'>${fmtBRL(sub)}</td><td class='right'><button class='danger' data-del='${idx}'>Remover</button></td>`; tb.appendChild(tr) }); const desc = +$('#pos-desconto').value || 0; $('#pos-total').textContent = fmtBRL(Math.max(0, total - desc)); tb.querySelectorAll('input.qtd').forEach(inp => inp.oninput = (e) => { const i = +e.target.dataset.idx; carrinho[i].qtd = Math.max(1, +e.target.value || 1); renderCarrinho() }); tb.querySelectorAll('button[data-del]').forEach(b => b.onclick = (e) => { const i = +e.target.dataset.del; carrinho.splice(i, 1); renderCarrinho() }) }
+        $('#pos-add')?.addEventListener('click', () => { const cod = $('#pos-barcode').value.trim(); const qtd = Math.max(1, +$('#pos-qtd').value || 1); if (!cod) return mostrarPopup('Informe o código'); addCarrinho(cod, qtd); $('#pos-barcode').value = ''; $('#pos-qtd').value = 1; $('#pos-barcode').focus() });
+        $('#pos-desconto')?.addEventListener('input', renderCarrinho);
+        $('#btnNovaVenda')?.addEventListener('click', () => { carrinho.length = 0; renderCarrinho(); $('#pos-cliente').value = ''; $('#pos-desconto').value = 0; mostrarPopup('Carrinho limpo') })
+
+        // Finalizar venda
+        $('#pos-finalizar')?.addEventListener('click', () => {
+            if (carrinho.length === 0) return mostrarPopup('Carrinho vazio');
+
+            if (state.cfg.controlaEstoque) {
+                for (const it of carrinho) {
+                    const p = state.produtos.find(x => x.codigo === it.codigo);
+                    if (!p || (p.estoque || 0) < it.qtd) {
+                        return mostrarPopup(`Estoque insuficiente para "${it.nome}"`);
+                    }
+                }
+            }
+
+            const totalTxt = $('#pos-total').textContent.replace(/[^0-9,.-]/g, '').replace('.', '').replace(',', '.');
+            const total = +totalTxt || 0;
+
+            const itensEnriquecidos = carrinho.map(i => {
+                const pRef = state.produtos.find(x => x.codigo === i.codigo);
+                return {
+                    ...i,
+                    custo: pRef ? (+pRef.custo || 0) : 0,
+                    categoria: pRef ? (pRef.categoria || '—') : '—'
+                };
+            });
+
+            const venda = {
+                id: uid(),
+                data: new Date().toISOString(),
+                itens: itensEnriquecidos,
+                total,
+                pagto: $('#pos-pagto').value,
+                cliente: $('#pos-cliente').value.trim()
+            };
+
+            // Atualiza estoque
+            if (state.cfg.controlaEstoque) {
+                for (const it of venda.itens) {
+                    const p = state.produtos.find(x => x.codigo === it.codigo);
+                    if (p) p.estoque -= it.qtd;
+                }
+                DB.set('produtos', state.produtos);
+            }
+            // Controla estoque se habilitado
+            if (state.cfg.controlaEstoque) { for (const it of venda.itens) { const p = state.produtos.find(x => x.codigo === it.codigo); if (p) { p.estoque = Math.max(0, (+p.estoque || 0) - it.qtd) } } DB.set('produtos', state.produtos) }
+
+            // Lançamento no caixa
+            state.caixa.push({ id: uid(), data: venda.data, desc: `Venda PDV ${venda.id}`, cat: 'Vendas', entrada: venda.total, saida: 0 });
+            DB.set('caixa', state.caixa);
+
+            // Guarda a venda
+            state.vendas.push(venda); DB.set('vendas', state.vendas);
+
+            // Emite NF simulada se marcado
+            if ($('#pos-nf').checked) gerarDanfeSimulada(venda);
+
+            carrinho.length = 0; syncFirebase(); renderCarrinho(); listarProdutos(); listarCaixa(); mostrarPopup('Venda concluída!')
+        })
+
+        // =============== Scanner com QuaggaJS ===============
+
+        // Controle do Scanner com QuaggaJS
+        let scanning = false;
+
+        // Inicia o scanner
+        function startScanner() {
+            if (!window.Quagga) {
+                alert('QuaggaJS não carregado');
+                return;
+            }
+
+            const el = document.getElementById('scanner');
+            el.style.display = 'block';
+
+            Quagga.init({
+                inputStream: {
+                    name: 'Live',
+                    type: 'LiveStream',
+                    target: el,
+                    constraints: {
+                        facingMode: 'environment' // câmera traseira
+                    }
+                },
+                decoder: {
+                    readers: ['ean_reader', 'ean_8_reader', 'code_128_reader', 'upc_reader']
+                }
+            }, (err) => {
+                if (err) {
+                    console.error(err);
+                    alert('Erro ao iniciar câmera');
+                    return;
+                }
+                Quagga.start();
+                scanning = true;
+                mostrarPopup('Scanner ativo');
+            });
+
+            Quagga.onDetected(handleDetection);
+        }
+
+        // Para o scanner
+        function stopScanner() {
+            if (window.Quagga && scanning) {
+                Quagga.stop();
+                scanning = false;
+                document.getElementById('scanner').style.display = 'none';
+                mostrarPopup('Scanner parado');
+                Quagga.offDetected(handleDetection); // remove o listener
+            }
+        }
+
+        // Função que processa a leitura do código de barras
+        function handleDetection(data) {
+            if (!scanning) return;
+
+            const code = data.codeResult.code;
+            document.getElementById('pos-barcode').value = code;
+
+            // Adiciona ao carrinho (com quantidade mínima de 1)
+            const quantidade = Math.max(1, +document.getElementById('pos-qtd').value || 1);
+            addCarrinho(code, quantidade);
+        }
+
+        // Event listeners para botões
+        document.getElementById('btnStartScan')?.addEventListener('click', startScanner);
+        document.getElementById('btnStopScan')?.addEventListener('click', stopScanner);
+
+        // =============== CAIXA ===============
+        function listarCaixa() { const tbody = $('#tblCaixa tbody'); tbody.innerHTML = ''; const ini = $('#cx-inicio').value ? new Date($('#cx-inicio').value) : null; const fim = $('#cx-fim').value ? new Date($('#cx-fim').value + 'T23:59:59') : null; let saldo = 0; state.caixa.filter(l => { const d = new Date(l.data); return (!ini || d >= ini) && (!fim || d <= fim) }).sort((a, b) => new Date(a.data) - new Date(b.data)).forEach(l => { saldo += (+l.entrada || 0) - (+l.saida || 0); const tr = document.createElement('tr'); tr.innerHTML = `<td>${new Date(l.data).toLocaleDateString()}</td><td>${l.desc}</td><td>${l.cat}</td><td class='right'>${l.entrada ? fmtBRL(+l.entrada) : ''}</td><td class='right'>${l.saida ? fmtBRL(+l.saida) : ''}</td><td class='right'><button class='danger' onclick="excluirLancamento('${l.id}')">Excluir</button></td>`; tbody.appendChild(tr) }); const elSaldo = $('#cx-saldo'); elSaldo.textContent = `Saldo: ${fmtBRL(saldo)}`; elSaldo.className = 'pill ' + (saldo > 0 ? 'status-ok' : (saldo < 0 ? 'status-danger' : 'status-warn')) }
+        function excluirLancamento(id) {
+            if (!confirm('Excluir lançamento?')) return;
+
+            // Encontrar o lançamento no caixa
+            const lanc = state.caixa.find(x => x.id === id);
+
+            if (lanc) {
+                // Remove do caixa
+                state.caixa = state.caixa.filter(x => x.id !== id);
+                DB.set('caixa', state.caixa);
+
+                // Verifica se é uma venda vinculada e remove
+                const match = lanc.desc.match(/Venda PDV (\w+)/);
+                if (match) {
+                    const vendaId = match[1];
+                    state.vendas = state.vendas.filter(v => v.id !== vendaId);
+                    DB.set('vendas', state.vendas);
+                }
+
+                syncFirebase();
+                listarCaixa();
+                mostrarPopup('Lançamento removido!');
+            }
+        }
+        $('#btnLancamento')?.addEventListener('click', () => { $('#l-data').valueAsDate = new Date(); $('#l-cat').value = ''; $('#l-desc').value = ''; $('#l-valor').value = ''; $('#l-tipo').value = 'E'; $('#l-salvar').onclick = (e) => { e.preventDefault(); const tipo = $('#l-tipo').value; const val = +$('#l-valor').value || 0; const obj = { id: uid(), data: ($('#l-data').value ? new Date($('#l-data').value) : new Date()).toISOString(), desc: $('#l-desc').value.trim(), cat: $('#l-cat').value.trim(), entrada: tipo === 'E' ? val : 0, saida: tipo === 'S' ? val : 0 }; state.caixa.push(obj); DB.set('caixa', state.caixa); $('#dlgLancamento').close(); listarCaixa(); mostrarPopup('Lançamento salvo') }; $('#dlgLancamento').showModal() })
+        // Estado de UI (bloqueia/permite PDV, troca botões)
+        function aplicarEstadoCaixa() {
+            const bloqueado = !state.caixaStatus.aberto;
+            // Botões PDV
+            ['pos-add', 'pos-finalizar', 'btnStartScan', 'btnNovaVenda'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.disabled = bloqueado;
+            });
+            // Sinalização visual
+            const posSec = document.getElementById('sec-pos');
+            if (posSec) posSec.style.opacity = bloqueado ? .6 : 1;
+
+            // Botões Fechar/Abrir
+            const btnFech = document.getElementById('btnFechamento');
+            const btnAbrir = document.getElementById('btnAbrirCaixa');
+            if (btnFech) btnFech.style.display = bloqueado ? 'none' : 'inline-block';
+            if (btnAbrir) btnAbrir.style.display = bloqueado ? 'inline-block' : 'none';
+        }
+
+        // Cálculo do resumo do dia
+        function calcularResumoDia(base = new Date()) {
+            const [ini, fim] = dayBounds(base);
+
+            // Vendas do dia
+            const vendasDia = state.vendas.filter(v => {
+                const d = new Date(v.data);
+                return d >= ini && d <= fim;
+            });
+
+            const totalVendas = clamp2(vendasDia.reduce((a, v) => a + (+v.total || 0), 0));
+
+            // Por forma de pagamento
+            const formas = {};
+            vendasDia.forEach(v => {
+                formas[v.pagto] = clamp2((formas[v.pagto] || 0) + (+v.total || 0));
+            });
+
+            // Itens agregados e lucro
+            const mapa = {}; // por código
+            let lucroLiquido = 0;
+            vendasDia.forEach(v => v.itens.forEach(it => {
+                const k = it.codigo;
+                if (!mapa[k]) mapa[k] = { codigo: k, nome: it.nome, categoria: it.categoria || '—', qtd: 0, custoTotal: 0, vendaTotal: 0, lucroTotal: 0 };
+                mapa[k].qtd += it.qtd;
+                mapa[k].custoTotal = clamp2(mapa[k].custoTotal + (it.custo || 0) * it.qtd);
+                mapa[k].vendaTotal = clamp2(mapa[k].vendaTotal + (it.preco || 0) * it.qtd);
+                const lucroItem = ((it.preco || 0) - (it.custo || 0)) * it.qtd;
+                mapa[k].lucroTotal = clamp2(mapa[k].lucroTotal + lucroItem);
+                lucroLiquido = clamp2(lucroLiquido + lucroItem);
+            }));
+            const itensAgr = Object.values(mapa).sort((a, b) => a.nome.localeCompare(b.nome));
+
+            // Lançamentos do dia (entradas/saídas)
+            const movDia = state.caixa.filter(l => {
+                const d = new Date(l.data);
+                return d >= ini && d <= fim;
+            });
+            const totalEntradas = clamp2(movDia.reduce((a, l) => a + (+l.entrada || 0), 0));
+            const totalSaidas = clamp2(movDia.reduce((a, l) => a + (+l.saida || 0), 0));
+            const saldoDia = clamp2(totalEntradas - totalSaidas);
+
+            // Saídas detalhadas (somente >0)
+            const saidasDetalhe = movDia.filter(l => +l.saida > 0);
+
+            return {
+                dataRef: ini.toISOString().slice(0, 10),
+                vendasDia,
+                totalVendas,
+                formas,
+                itensAgr,
+                totalEntradas,
+                totalSaidas,
+                saldoDia,
+                lucroLiquido,
+                saidasDetalhe
+            };
+        }
+
+        // Render do modal de fechamento (bloqueante)
+        function abrirModalFechamento(res) {
+            const dlg = document.getElementById('dlgFechamentoDia');
+            const box = document.getElementById('fech-resumo');
+
+            // Tabela formas de pagamento
+            const formasRows = Object.keys(res.formas).map(fp =>
+                `<tr><td>${fp}</td><td class="right">${toBRL(res.formas[fp])}</td></tr>`
+            ).join('') || `<tr><td>—</td><td class="right">${toBRL(0)}</td></tr>`;
+
+            // Saídas do dia
+            const saidasRows = res.saidasDetalhe.map(s =>
+                `<tr><td>${new Date(s.data).toLocaleTimeString('pt-BR')}</td><td>${s.desc}</td><td class="right">${toBRL(s.saida)}</td></tr>`
+            ).join('') || `<tr><td colspan="3" class="muted">Sem saídas</td></tr>`;
+
+            // Produtos vendidos (agregado)
+            const itensRows = res.itensAgr.map(it =>
+                `<tr>
+      <td>${it.nome}</td>
+      <td class="right">${it.qtd}</td>
+      <td class="right">${toBRL(it.custoTotal)}</td>
+      <td class="right">${toBRL(it.vendaTotal)}</td>
+      <td class="right">${toBRL(it.lucroTotal)}</td>
+    </tr>`
+            ).join('') || `<tr><td colspan="5" class="muted">Sem vendas</td></tr>`;
+
+            box.innerHTML = `
+    <div class="row">
+      <div class="pill status-ok">Vendas: ${toBRL(res.totalVendas)}</div>
+      <div class="pill ${res.totalSaidas > 0 ? 'status-warn' : 'status-ok'}">Saídas: ${toBRL(res.totalSaidas)}</div>
+      <div class="pill ${res.lucroLiquido >= 0 ? 'status-ok' : 'status-danger'}">Lucro Líquido: ${toBRL(res.lucroLiquido)}</div>
+      <div class="pill ${res.saldoDia >= 0 ? 'status-ok' : 'status-danger'}">Saldo do Dia: ${toBRL(res.saldoDia)}</div>
+    </div>
+
+    <h4 style="margin-top:12px">Vendas por Forma de Pagamento</h4>
+    <table><thead><tr><th>Forma</th><th class="right">Total</th></tr></thead><tbody>${formasRows}</tbody></table>
+
+    <h4 style="margin-top:12px">Saídas do Dia</h4>
+    <table><thead><tr><th>Hora</th><th>Descrição</th><th class="right">Valor</th></tr></thead><tbody>${saidasRows}</tbody></table>
+
+    <h4 style="margin-top:12px">Produtos Vendidos (Agregado)</h4>
+    <table>
+      <thead><tr>
+        <th>Produto</th><th class="right">Qtd</th><th class="right">Custo</th>
+        <th class="right">Venda</th><th class="right">Lucro</th>
+      </tr></thead>
+      <tbody>${itensRows}</tbody>
+    </table>
+  `;
+
+            // Sugestões iniciais
+            const inpRet = document.getElementById('fech-retirar');
+            const inpTrc = document.getElementById('fech-troco');
+            const sugeridoTroco = clamp2(state.caixaStatus.trocoProximoDia || 0); // mantém o último como default
+            const sugeridoRetirada = Math.max(0, clamp2(res.saldoDia - sugeridoTroco));
+            inpRet.value = sugeridoRetirada.toFixed(2);
+            inpTrc.value = sugeridoTroco.toFixed(2);
+
+            // Bloqueia ESC / clique fora
+            dlg.addEventListener('cancel', (e) => e.preventDefault(), { once: true });
+            dlg.addEventListener('click', (e) => {
+                if (e.target === dlg) e.preventDefault();
+            });
+
+            // Confirmar fechamento
+            document.getElementById('fech-confirmar').onclick = (e) => {
+                e.preventDefault();
+                confirmarFechamento(res);
+            };
+
+            dlg.showModal();
+        }
+
+        function confirmarFechamento(res) {
+            const dlg = document.getElementById('dlgFechamentoDia');
+            const retirar = clamp2($('#fech-retirar').value);
+            const troco = clamp2($('#fech-troco').value);
+            if (retirar < 0 || troco < 0) return alert('Valores inválidos.');
+            if (retirar + troco > res.saldoDia + 0.0001) return alert('A soma de Retirada + Troco excede o saldo do dia.');
+
+            const agora = new Date().toISOString();
+
+            // Monta objeto fechamento (guarda tudo para histórico)
+            const fechamento = {
+                id: uid(),
+                dataRef: res.dataRef,
+                fechadoEm: agora,
+                totalVendas: res.totalVendas,
+                formasPagamento: res.formas,
+                totalEntradas: res.totalEntradas,
+                totalSaidas: clamp2(res.totalSaidas + retirar),
+                saldoDia: clamp2(res.saldoDia - retirar),
+                lucroLiquido: res.lucroLiquido,
+                retirado: retirar,
+                mantidoTroco: troco,
+                itensVendidos: res.itensAgr,
+                vendasIds: res.vendasDia.map(v => v.id)
+            };
+
+            state.fechamentos.push(fechamento);
+            DB.set('fechamentos', state.fechamentos);
+
+            // ===== LIMPA TODO o fluxo do caixa =====
+            state.caixa = [];
+
+            // Atualiza status do caixa (fechado e guarda troco p/ amanhã)
+            state.caixaStatus = { aberto: false, trocoProximoDia: troco, abertoEm: null, fechadoEm: agora };
+            DB.set('caixaStatus', state.caixaStatus);
+            DB.set('caixa', state.caixa);
+
+            if (typeof syncFirebase === 'function') syncFirebase();
+            listarCaixa();
+            listarFechamentos();
+            aplicarEstadoCaixa();
+            dlg.close();
+            mostrarPopup('Caixa fechado e registrado.');
+        }
+        // Botão Fechar Caixa → abre modal com cálculo
+        document.getElementById('btnFechamento')?.addEventListener('click', () => {
+            if (!state.caixaStatus.aberto) return mostrarPopup('Caixa já está fechado.');
+            const resumo = calcularResumoDia(new Date());
+            abrirModalFechamento(resumo);
+        });
+
+        // Abrir Caixa para o próximo dia (injeta troco como abertura)
+        document.getElementById('btnAbrirCaixa')?.addEventListener('click', () => {
+            if (state.caixaStatus.aberto) return mostrarPopup('Caixa já está aberto.');
+
+            const valorTroco = clamp2(state.caixaStatus.trocoProximoDia || 0);
+            if (valorTroco > 0) {
+                state.caixa.push({
+                    id: uid(),
+                    data: new Date().toISOString(),
+                    desc: 'Abertura — Valor de Troco',
+                    cat: 'Abertura',
+                    entrada: valorTroco,
+                    saida: 0
+                });
+                state.caixaStatus.trocoProximoDia = 0; // já usado
+            }
+
+            state.caixaStatus.aberto = true;
+            state.caixaStatus.abertoEm = new Date().toISOString();
+            state.caixaStatus.fechadoEm = null;
+
+            DB.set('caixa', state.caixa);
+            DB.set('caixaStatus', state.caixaStatus);
+            if (typeof syncFirebase === 'function') syncFirebase();
+            aplicarEstadoCaixa();
+            listarCaixa();
+            mostrarPopup('Caixa aberto para o novo dia.');
+        });
+
+        // Inicializa estado de UI ao carregar
+        aplicarEstadoCaixa();
+
+        $('#cx-aplicar')?.addEventListener('click', listarCaixa);
+
+        function listarFechamentos() {
+            const tb = document.querySelector('#tblFechamentos tbody');
+            if (!tb) return;
+            tb.innerHTML = '';
+            const arr = [...state.fechamentos].sort((a, b) => new Date(b.fechadoEm) - new Date(a.fechadoEm));
+            arr.forEach(f => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+      <td>${new Date(f.dataRef + 'T00:00:00').toLocaleDateString('pt-BR')}</td>
+      <td class="right">${toBRL(f.totalVendas)}</td>
+      <td class="right">${toBRL(f.totalSaidas)}</td>
+      <td class="right">${toBRL(f.lucroLiquido)}</td>
+      <td class="right">${toBRL(f.retirado)}</td>
+      <td class="right">${toBRL(f.mantidoTroco)}</td>
+      <td class="right"><button class="ghost" data-det="${f.id}">Detalhes</button></td>
+    `;
+                tb.appendChild(tr);
+            });
+            tb.querySelectorAll('button[data-det]').forEach(btn => {
+                btn.onclick = () => abrirDetalheFechamento(btn.dataset.det);
+            });
+        }
+
+        function abrirDetalheFechamento(id) {
+            const f = state.fechamentos.find(x => x.id === id);
+            if (!f) return;
+            const dlg = document.getElementById('dlgFechDet');
+            const titulo = document.getElementById('fechDet-titulo');
+            const box = document.getElementById('fechDet-conteudo');
+
+            const formasRows = Object.keys(f.formasPagamento || {}).map(fp =>
+                `<tr><td>${fp}</td><td class="right">${toBRL(f.formasPagamento[fp])}</td></tr>`
+            ).join('') || `<tr><td>—</td><td class="right">${toBRL(0)}</td></tr>`;
+
+            const itensRows = (f.itensVendidos || []).map(it =>
+                `<tr>
+      <td>${it.nome}</td><td class="right">${it.qtd}</td>
+      <td class="right">${toBRL(it.custoTotal)}</td>
+      <td class="right">${toBRL(it.vendaTotal)}</td>
+      <td class="right">${toBRL(it.lucroTotal)}</td>
+    </tr>`
+            ).join('') || `<tr><td colspan="5" class="muted">Sem itens</td></tr>`;
+
+            titulo.textContent = `Fechamento — ${new Date(f.dataRef + 'T00:00:00').toLocaleDateString('pt-BR')}`;
+            box.innerHTML = `
+    <div class="row">
+      <div class="pill status-ok">Vendas: ${toBRL(f.totalVendas)}</div>
+      <div class="pill ${f.totalSaidas > 0 ? 'status-warn' : 'status-ok'}">Saídas: ${toBRL(f.totalSaidas)}</div>
+      <div class="pill ${f.lucroLiquido >= 0 ? 'status-ok' : 'status-danger'}">Lucro Líquido: ${toBRL(f.lucroLiquido)}</div>
+      <div class="pill ${f.saldoDia >= 0 ? 'status-ok' : 'status-danger'}">Saldo do Dia: ${toBRL(f.saldoDia)}</div>
+      <div class="pill">Retirado: ${toBRL(f.retirado)}</div>
+      <div class="pill">Troco p/ Próx. Dia: ${toBRL(f.mantidoTroco)}</div>
+    </div>
+
+    <h4 style="margin-top:12px">Vendas por Forma de Pagamento</h4>
+    <table><thead><tr><th>Forma</th><th class="right">Total</th></tr></thead><tbody>${formasRows}</tbody></table>
+
+    <h4 style="margin-top:12px">Produtos Vendidos</h4>
+    <table>
+      <thead><tr>
+        <th>Produto</th><th class="right">Qtd</th><th class="right">Custo</th>
+        <th class="right">Venda</th><th class="right">Lucro</th>
+      </tr></thead>
+      <tbody>${itensRows}</tbody>
+    </table>
+  `;
+            dlg.showModal();
+        }
+
+        // ================= RELATÓRIOS AVANÇADOS =================
+        function gerarRelatorio() {
+            const inicio = $('#rel-inicio').value ? new Date($('#rel-inicio').value) : null;
+            const fim = $('#rel-fim').value ? new Date($('#rel-fim').value + "T23:59:59") : null;
+
+            const vendas = state.vendas.filter(v => {
+                const d = new Date(v.data);
+                return (!inicio || d >= inicio) && (!fim || d <= fim);
+            });
+
+            if (vendas.length === 0) {
+                $('#relatorio-container').innerHTML = "<p>Nenhuma venda neste período.</p>";
+                return;
+            }
+
+            // --- Cálculos principais ---
+            const totalVendas = vendas.reduce((a, v) => a + (+v.total || 0), 0);
+            const qtdVendas = vendas.length;
+            const lucro = vendas.reduce((a, v) =>
+                a + v.itens.reduce((s, it) => s + ((it.preco - it.custo) * it.qtd), 0)
+                , 0);
+
+            const clientes = [...new Set(vendas.map(v => v.cliente))].length;
+            const ticketMedio = totalVendas / qtdVendas;
+            const lucroMedio = lucro / qtdVendas;
+            const margemLucro = (lucro / totalVendas) * 100;
+
+            // --- Produto mais vendido ---
+            const produtos = {};
+            vendas.forEach(v => v.itens.forEach(it => {
+                produtos[it.nome] = (produtos[it.nome] || 0) + it.qtd;
+            }));
+            const topProduto = Object.entries(produtos).sort((a, b) => b[1] - a[1])[0];
+
+            // --- Forma de pagamento mais usada ---
+            const formas = {};
+            vendas.forEach(v => { formas[v.pagto] = (formas[v.pagto] || 0) + 1; });
+            const topForma = Object.entries(formas).sort((a, b) => b[1] - a[1])[0];
+
+            // --- Clientes que mais gastaram ---
+            const porCliente = {};
+            vendas.forEach(v => { porCliente[v.cliente] = (porCliente[v.cliente] || 0) + v.total; });
+            const topClientes = Object.entries(porCliente).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+            // --- Top dias ---
+            const porDia = {};
+            vendas.forEach(v => {
+                const d = new Date(v.data).toLocaleDateString('pt-BR');
+                porDia[d] = (porDia[d] || 0) + v.total;
+            });
+            const topDias = Object.entries(porDia).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+            // --- Monta HTML com estilo ---
+            $('#relatorio-container').innerHTML = `
+      <div class="rel-grid">
+        <div class="rel-card"><h4>Faturamento</h4><p>${toBRL(totalVendas)}</p></div>
+        <div class="rel-card"><h4>Lucro líquido</h4><p>${toBRL(lucro)}</p></div>
+        <div class="rel-card"><h4>Ticket médio</h4><p>${toBRL(ticketMedio)}</p></div>
+        <div class="rel-card"><h4>Vendas</h4><p>${qtdVendas}</p></div>
+        <div class="rel-card"><h4>Clientes únicos</h4><p>${clientes}</p></div>
+        <div class="rel-card"><h4>Lucro/venda</h4><p>${toBRL(lucroMedio)}</p></div>
+        <div class="rel-card"><h4>Margem</h4><p>${margemLucro.toFixed(1)}%</p></div>
+      </div>
+
+      <div>
+        <button class="rel-toggle active" data-target="destaques">Destaques</button>
+        <button class="rel-toggle active" data-target="clientes">Top Clientes</button>
+        <button class="rel-toggle active" data-target="dias">Top Dias</button>
+      </div>
+
+      <div id="rel-destaques" class="rel-list">
+        <h3>📌 Destaques</h3>
+        <ul>
+          <li>Produto mais vendido: <b>${topProduto ? topProduto[0] + " (" + topProduto[1] + " un)" : "—"}</b></li>
+          <li>Forma de pagamento mais usada: <b>${topForma ? topForma[0] + " (" + topForma[1] + ")" : "—"}</b></li>
+        </ul>
+      </div>
+
+      <div id="rel-clientes" class="rel-list">
+        <h3>🏆 Top 5 Clientes</h3>
+        <ol>${topClientes.map(c => `<li>${c[0]} - ${toBRL(c[1])}</li>`).join("")}</ol>
+      </div>
+
+      <div id="rel-dias" class="rel-list">
+        <h3>📅 Top 5 Dias</h3>
+        <ol>${topDias.map(d => `<li>${d[0]} - ${toBRL(d[1])}</li>`).join("")}</ol>
+      </div>
+    `;
+
+            // Controle dos botões toggle
+            document.querySelectorAll(".rel-toggle").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const target = btn.dataset.target;
+                    const section = document.getElementById("rel-" + target);
+                    btn.classList.toggle("active");
+                    section.style.display = section.style.display === "none" ? "block" : "none";
+                });
+            });
+        }
+
+        // Botão para atualizar relatório
+        $('#rel-aplicar')?.addEventListener('click', gerarRelatorio);
+
+        // =============== CONFIG ===============
+        function renderCfg() { $('#cfg-nome').value = state.cfg.nome || ''; $('#cfg-cnpj').value = state.cfg.cnpj || ''; $('#cfg-ie').value = state.cfg.ie || ''; $('#cfg-endereco').value = state.cfg.endereco || ''; $('#cfg-icms').value = state.cfg.icms || 0; $('#cfg-iss').value = state.cfg.iss || 0; $('#cfg-controlaEstoque').checked = !!state.cfg.controlaEstoque }
+        $('#btnSalvarCfg')?.addEventListener('click', () => { state.cfg = { nome: $('#cfg-nome').value.trim(), cnpj: $('#cfg-cnpj').value.trim(), ie: $('#cfg-ie').value.trim(), endereco: $('#cfg-endereco').value.trim(), icms: +$('#cfg-icms').value || 0, iss: +$('#cfg-iss').value || 0, controlaEstoque: $('#cfg-controlaEstoque').checked }; DB.set('cfg', state.cfg); syncFirebase(); mostrarPopup('Configurações salvas') });
+
+        // =============== DANFE (SIMULADA) ===============
+        async function gerarDanfeSimulada(venda) {
+            const { jsPDF } = window.jspdf; const doc = new jsPDF(); const cfg = state.cfg; doc.setFontSize(14); doc.text(cfg.nome || 'Minha Loja', 14, 16); doc.setFontSize(10); doc.text(`CNPJ: ${cfg.cnpj || '-'}  IE: ${cfg.ie || '-'}`, 14, 22); doc.text(cfg.endereco || '', 14, 28); doc.setFontSize(12); doc.text('DANFE (Simulado) — Documento Auxiliar da NF-e', 14, 38);
+            doc.setFontSize(10); doc.text(`Data: ${new Date(venda.data).toLocaleString('pt-BR')}`, 14, 46); doc.text(`Cliente: ${venda.cliente || '-'}`, 14, 52); doc.text(`Pagamento: ${venda.pagto}`, 14, 58);
+            const body = venda.itens.map((it, i) => { return [(i + 1).toString(), it.codigo, it.nome, it.qtd.toString(), it.preco.toFixed(2), (it.qtd * it.preco).toFixed(2)] });
+            doc.autoTable({ startY: 64, head: [['#', 'Cód.', 'Produto', 'Qtd', 'Preço', 'Subtotal']], body });
+            const total = venda.total; const base = total; const icms = base * ((+cfg.icms || 0) / 100); const iss = base * ((+cfg.iss || 0) / 100);
+            const y = doc.autoTable.previous.finalY + 8; doc.text(`Base de Cálculo: R$ ${base.toFixed(2)}`, 14, y); doc.text(`ICMS (${(+cfg.icms || 0).toFixed(2)}%): R$ ${icms.toFixed(2)}`, 14, y + 6); doc.text(`ISS (${(+cfg.iss || 0).toFixed(2)}%): R$ ${iss.toFixed(2)}`, 14, y + 12); doc.setFontSize(12); doc.text(`TOTAL: R$ ${total.toFixed(2)}`, 150, y + 12);
+            doc.save(`DANFE_${venda.id}.pdf`)
+        }
+    </script>
+</body>
+
+>>>>>>> b946784e8a78f522c8f93f3abd24e8a546e57888
 </html>

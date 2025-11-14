@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -350,4 +351,2734 @@
 
 </body>
 
+=======
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel do Usuário - Configurações da Loja</title>
+    <style>
+        :root {
+            --bg: #f5f7ff;
+            --card: #ffffff;
+            --muted: #6b7280;
+            --text: #1e293b;
+            --accent: #3a86ff;
+            --accent-2: #00b4d8;
+            --ok: #2ecc71;
+            --warn: #f39c12;
+            --danger: #e74c3c;
+            --radius: 12px;
+            --shadow: 0 4px 15px rgba(0, 0, 0, .1);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Inter, system-ui, Segoe UI, Roboto, Helvetica, Arial;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Navbar lateral */
+        aside {
+            width: 250px;
+            background: #ffffff;
+            border-right: 1px solid rgba(0, 0, 0, .1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: var(--shadow);
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+        }
+
+        .brand {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, .05);
+        }
+
+        .brand .logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            box-shadow: var(--shadow);
+        }
+
+        .brand-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .brand:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .brand h2 {
+            font-size: 1.2rem;
+            margin: 0;
+        }
+
+        nav {
+            padding: 20px 0;
+        }
+
+        nav a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            text-decoration: none;
+            color: var(--muted);
+            font-weight: 500;
+            transition: background .2s, color .2s;
+        }
+
+        nav a:hover {
+            background: #eef3ff;
+            color: var(--accent);
+        }
+
+        nav a.active {
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            color: #fff;
+        }
+
+        footer {
+            padding: 20px;
+            border-top: 1px solid rgba(0, 0, 0, .05);
+        }
+
+        #btnHome {
+            width: 100%;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            margin-bottom: 2px;
+            transition: all 0.5s ease;
+
+        }
+
+        #btnHome:hover {
+            opacity: 0.8;
+            transition: all 0.5s ease;
+        }
+
+        #btnLogout {
+            width: 100%;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            background: #ea2e19;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.5s ease;
+        }
+
+        #btnLogout:hover {
+            background: var(--danger);
+            transition: all 0.5s ease;
+        }
+
+        /* Área principal */
+        main {
+            margin-left: 250px;
+            flex: 1;
+            padding: 30px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        .user-panel {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #1e293b;
+            padding: 10px 16px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: Inter, system-ui, sans-serif;
+            font-weight: 500;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .user-panel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Conteúdo */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            border: 1px solid rgba(0, 0, 0, .05);
+        }
+
+        .card h2 {
+            font-size: 1.2rem;
+            margin-top: 0;
+            margin-bottom: 16px;
+        }
+
+        .row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .row label {
+            font-size: .9rem;
+            color: var(--muted);
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid rgba(0, 0, 0, .1);
+            border-radius: 8px;
+            background: #ffffff;
+            color: var(--text);
+            outline: none;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.1);
+        }
+
+        button {
+            appearance: none;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            color: #ffffff;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: all 0.5s ease;
+        }
+
+        button:hover {
+            opacity: 0.8;
+            transition: all 0.5s ease;
+        }
+
+        button.save {
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.5s ease;
+        }
+
+        button.save:hover {
+            opacity: 0.8;
+            transition: all 0.5s ease;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-title {
+            font-weight: 600;
+            margin-top: 10px;
+            margin-bottom: 4px;
+        }
+
+        .status-pill {
+            text-align: center;
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-size: .8rem;
+            background: rgba(46, 204, 113, .15);
+            color: var(--ok);
+            display: inline-block;
+        }
+
+        /* Responsivo */
+        @media (max-width: 900px) {
+            aside {
+                width: 70px;
+            }
+
+            aside .brand h2 {
+                display: none;
+            }
+
+            nav a span {
+                display: none;
+            }
+
+            main {
+                margin-left: 70px;
+                padding: 16px;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .rel-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .rel-card {
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 10px;
+            text-align: center;
+        }
+
+        .rel-card h4 {
+            color: var(--muted);
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .rel-card p {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 4px 0 0;
+        }
+
+        .rel-list {
+            margin-top: 15px;
+        }
+
+        .rel-list h3 {
+            margin-bottom: 8px;
+        }
+
+        .rel-list ol,
+        .rel-list ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .rel-toggle {
+            margin: 5px;
+            padding: 6px 10px;
+            border: none;
+            background: var(--accent);
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .rel-toggle:hover {
+            opacity: 0.9;
+        }
+
+        /* ==== Dashboard Profissional ==== */
+
+        .rel-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .rel-card-pro {
+            background: var(--card-bg, #fff);
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            padding: 20px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .rel-card-pro:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+        }
+
+        .rel-header {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* 👈 centraliza ícone + texto */
+
+        }
+
+        .rel-header h3 {
+            font-weight: 700;
+            color: var(--text, #333);
+            text-align: center;
+            /* segurança extra */
+        }
+
+
+        .rel-header .icon {
+            font-size: 1.4rem;
+        }
+
+        .rel-body {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .rel-item {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(0, 0, 0, 0.02);
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        .rel-item strong {
+            color: var(--accent, #00b894);
+        }
+
+        .rel-rank {
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.02);
+            border-radius: 8px;
+            padding: 10px 14px;
+        }
+
+        .rank-num {
+            font-weight: 600;
+            font-size: 1rem;
+            width: 30px;
+            height: 30px;
+            background: var(--accent, #00b894);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+        }
+
+        .rank-info {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .rank-info strong {
+            color: var(--accent, #00b894);
+        }
+
+
+        #charts-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+            margin-top: 30px;
+            padding: 10px;
+        }
+
+        #charts-container>div {
+            background: var(--card-bg, #ffffff);
+            border-radius: 14px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            padding: 20px;
+            transition: all 0.3s ease;
+            min-height: 350px;
+        }
+
+        #charts-container>div:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 22px rgba(0, 0, 0, 0.12);
+        }
+
+        /* 🔹 Ajuste de títulos internos do ECharts */
+        .echarts-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* 🔹 Responsivo */
+        @media (min-width: 900px) {
+            #charts-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            #chart-lucro {
+                grid-column: span 2;
+            }
+        }
+
+        /* 🔹 Tema escuro opcional */
+        body.dark #charts-container>div {
+            background: #1e1e1e;
+            box-shadow: 0 4px 16px rgba(255, 255, 255, 0.05);
+        }
+
+        body.dark .echarts-title {
+            color: #eaeaea;
+        }
+
+        .smart-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            padding: 20px 30px;
+            background: linear-gradient(135deg, #3a86ff 0%, #00b4d8 100%);
+            border-radius: 16px;
+            margin-bottom: 25px;
+            font-family: 'Inter', sans-serif;
+            color: #fff;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .smart-indicator {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px 20px;
+            border-radius: 12px;
+            min-width: 220px;
+            justify-content: center;
+            transition: transform 0.3s, background 0.3s;
+        }
+
+        .smart-indicator:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .smart-indicator .icon {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            position: relative;
+        }
+
+        .nav-icon {
+            width: 18px;
+            /* tamanho do ícone */
+            height: 18px;
+            margin-right: 6px;
+            /* distância entre o ícone e o texto */
+            vertical-align: middle;
+            /* alinha com o texto */
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .meta-chart {
+            width: 100%;
+            height: 200px;
+        }
+
+        @media (max-width: 900px) {
+            .meta-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .meta-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .date-filter-pro {
+            background: var(--surface, #fff);
+            border-radius: 16px;
+            padding: 24px 28px;
+            margin: 0 auto 28px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 18px;
+            animation: fadeIn .3s ease;
+        }
+
+        /* =============== CABEÇALHO =============== */
+        .filter-header {
+            display: flex;
+            align-items: flex-start;
+            /* ícone alinhado ao topo do texto */
+            justify-content: center;
+            gap: 12px;
+            text-align: left;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .filter-icon {
+            width: 44px;
+            height: 44px;
+            flex-shrink: 0;
+            margin-top: 4px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+        }
+
+        /* Texto do cabeçalho (título + subtítulo) */
+        .filter-text {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            /* Alinha à esquerda */
+            gap: 4px;
+        }
+
+        .filter-text h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text, #222);
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        #periodo-label {
+            display: block;
+            margin-top: 4px;
+            font-size: 0.95rem;
+            color: var(--muted, #6b7280);
+            font-weight: 500;
+        }
+
+        /* =============== CONTROLES DE DATA =============== */
+        .filter-controls {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 14px;
+            align-items: flex-end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .filter-group label {
+            font-size: 0.9rem;
+            color: var(--muted, #555);
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+
+        .filter-group input {
+            background: var(--bg, #f5f7fa);
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-weight: 500;
+            text-align: center;
+            transition: all .2s ease;
+        }
+
+        .filter-group input:focus {
+            border-color: var(--accent, #3a86ff);
+            background: #fff;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.1);
+        }
+
+        /* =============== BOTÕES =============== */
+        .filter-controls button {
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform .2s, box-shadow .2s;
+        }
+
+        .filter-controls button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .filter-controls button.danger {
+            background: var(--danger, #e74c3c);
+        }
+
+        .filter-controls button.danger:hover {
+            background: #c0392b;
+        }
+
+        /* =============== ATALHOS RÁPIDOS =============== */
+        .filter-shortcuts {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 6px;
+        }
+
+        .filter-shortcuts button {
+            background: var(--bg, #f5f7fa);
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 8px 14px;
+            color: var(--text, #333);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all .25s ease;
+        }
+
+        .filter-shortcuts button:hover,
+        .filter-shortcuts button.active {
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            color: #fff;
+            border-color: transparent;
+            transform: translateY(-1px);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* =============== ANIMAÇÃO SUAVE =============== */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* =============================
+   🌟 ESTILO GERAL DOS CARDS
+   ============================= */
+        .card {
+            background: var(--surface, #fff);
+            border-radius: 12px;
+            padding: 24px 28px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            animation: fadeIn 0.3s ease;
+            transition: transform 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+        /* =============================
+   🏷️ CABEÇALHO DO CARD
+   ============================= */
+        .card-header {
+            display: flex;
+            align-items: center;
+            /* Centraliza verticalmente o texto e ícone */
+            justify-content: center;
+            /* 👈 Centraliza horizontalmente o conjunto */
+            gap: 10px;
+            margin-bottom: 18px;
+            text-align: center;
+        }
+
+        /* Ícone do cabeçalho */
+        .card-header .icon-img {
+            width: 44px;
+            height: 44px;
+            object-fit: contain;
+            flex-shrink: 0;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+            transition: transform 0.2s ease;
+        }
+
+        .card-header:hover .icon-img {
+            transform: scale(1.05);
+        }
+
+        /* Títulos (tanto h2 quanto h3) */
+        .card-header h2,
+        .card-header h3 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--text, #222);
+            margin: 0;
+            line-height: 1.1;
+            display: flex;
+            align-items: center;
+            text-align: center;
+        }
+
+        /* =============================
+   📋 CAMPOS E INPUTS
+   ============================= */
+        .row {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 14px;
+        }
+
+        .row label {
+            font-weight: 600;
+            color: var(--muted, #555);
+            margin-bottom: 4px;
+        }
+
+        .row input {
+            background: var(--bg, #f8f9fb);
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 8px 10px;
+            width: 100%;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .row input:focus {
+            border-color: var(--accent, #3a86ff);
+            background: #fff;
+            outline: none;
+        }
+
+        /* =============================
+   💾 BOTÕES
+   ============================= */
+        .save {
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            border: none;
+            color: white;
+            border-radius: 8px;
+            padding: 10px 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            width: fit-content;
+            align-items: center;
+        }
+
+        .save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+        }
+
+
+        /* =============================
+   🧩 ANIMAÇÃO DE ENTRADA
+   ============================= */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* =============================
+   📱 RESPONSIVIDADE
+   ============================= */
+        @media (max-width: 768px) {
+            .card-header {
+                justify-content: flex-start;
+                /* Alinha à esquerda em telas pequenas */
+                text-align: left;
+            }
+
+            .card-header .icon-img {
+                width: 38px;
+                height: 38px;
+            }
+
+            .card-header h2,
+            .card-header h3 {
+                font-size: 1.2rem;
+            }
+        }
+
+        /* Centraliza o botão "Salvar Metas" (e outros botões isolados dentro dos cards) */
+        .card button.save {
+            display: block;
+            margin: 20px auto 0;
+            /* 👈 Centraliza horizontalmente */
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 22px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            text-align: center;
+        }
+
+        .card button.save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+        }
+
+        .financeiro-container {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* 💼 Status geral */
+        .financeiro-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .financeiro-status .status-info h3 {
+            font-size: 1.2rem;
+            margin: 0;
+            color: var(--text);
+        }
+
+        .financeiro-status .status-info p {
+            margin: 4px 0 0;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        .financeiro-status .status-pill {
+            margin-top: 6px;
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .status-pill.ativo {
+            background: linear-gradient(135deg, var(--ok), #27ae60);
+            color: #fff;
+        }
+
+        .status-pill.inativo {
+            background: var(--danger);
+            color: #fff;
+        }
+
+        .financeiro-status .status-value {
+            text-align: center;
+        }
+
+        .financeiro-status .valor {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin: 6px 0 10px;
+        }
+
+        .pay-btn {
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            border: none;
+            border-radius: 8px;
+            padding: 10px 18px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .pay-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        /* 📊 Resumo financeiro */
+        .financeiro-detalhes {
+            padding: 20px 24px;
+        }
+
+        .detalhes-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .icon-img.small {
+            width: 32px;
+            height: 32px;
+        }
+
+        .detalhes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        .detalhe {
+            background: rgba(0, 0, 0, 0.02);
+            border-radius: 8px;
+            padding: 10px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .detalhe span {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .detalhe strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        /* 📜 Histórico */
+        .financeiro-historico table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            font-size: 0.95rem;
+        }
+
+        .financeiro-historico th {
+            background: var(--bg);
+            text-align: left;
+            padding: 10px 12px;
+            color: var(--muted);
+            font-weight: 600;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .financeiro-historico td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #f0f0f0;
+            color: var(--text);
+        }
+
+        .btn-comprovante {
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            border: none;
+            border-radius: 6px;
+            padding: 6px 12px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-comprovante:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        /* ✨ Animação */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            /* Centraliza verticalmente texto e imagem */
+            justify-content: flex-start;
+            /* Ícone à esquerda, texto à direita */
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .card-header .icon-img {
+            width: 42px;
+            height: 42px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+
+        .card-header h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text, #222);
+            margin: 0;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            /* Alinha o texto com o ícone */
+        }
+
+        /* === 🔒 BLOQUEIO DE PAINEL === */
+
+        /* 🧱 Aplica blur e desativa interações gerais */
+        body.bloqueado .section {
+            filter: blur(6px);
+            pointer-events: none;
+            user-select: none;
+            transition: filter 0.4s ease;
+        }
+
+        /* 💳 Mantém a seção financeiro sempre acessível */
+        body.bloqueado #financeiro {
+            filter: none !important;
+            pointer-events: auto !important;
+            user-select: auto !important;
+            position: relative;
+            z-index: 100;
+        }
+
+        /* ✨ Mensagem de aviso — fora do blur */
+        body.bloqueado::before {
+            content: "🔒 Acesso bloqueado — regularize sua assinatura para continuar.";
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #3a86ff, #00b4d8);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            font-weight: 600;
+            font-size: 0.9rem;
+            z-index: 9999;
+            /* 👈 Fora de qualquer blur */
+        }
+
+        /* Suavidade na entrada e saída do bloqueio */
+        body {
+            transition: filter 0.3s ease;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Barra lateral -->
+    <aside>
+        <div>
+            <a href="index.html" class="brand-link">
+                <div class="brand">
+                    <div class="logo"></div>
+                    <h2>Sua Loja</h2>
+                </div>
+            </a>
+            <nav>
+                <a href="#" data-section="perfil" class="active">
+                    <img src="img/profile.png" alt="Perfil" class="nav-icon">
+                    <span>Perfil</span>
+                </a>
+                <a href="#" data-section="dashboard">
+                    <img src="img/statistic.png" alt="Dashboard" class="nav-icon">
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" data-section="financeiro">
+                    <img src="img/financery.png" alt="Financeiro" class="nav-icon">
+                    <span>Financeiro</span>
+                </a>
+                <a href="#" data-section="ajuda">
+                    <img src="img/help.png" alt="Ajuda" class="nav-icon">
+                    <span>Ajuda</span>
+                </a>
+            </nav>
+        </div>
+        <footer>
+            <button id="btnHome">Voltar</button>
+            <button id="btnLogout">Deslogar</button>
+        </footer>
+    </aside>
+
+
+    <!-- Conteúdo principal -->
+    <main>
+        <header>
+            <h1 id="pageTitle">Painel de Perfil & Configurações</h1>
+            <div id="userPanel" class="user-panel">
+                <span id="userInfo">Carregando...</span>
+            </div>
+        </header>
+
+        <section id="perfil" class="section active">
+            <div class="grid">
+                <!-- Perfil -->
+                <div class="card">
+                    <div class="card-header">
+                        <img src="img/curriculum-vitae.png" alt="Usuário" class="icon-img">
+                        <h2>Informações do Usuário</h2>
+                    </div>
+
+                    <div class="row">
+                        <label>Nome completo</label>
+                        <input type="text" id="user-nome" value="João Freitas">
+                    </div>
+                    <div class="row">
+                        <label>E-mail</label>
+                        <input type="email" id="user-email" value="freitas@email.com">
+                    </div>
+                    <div class="row">
+                        <label>Senha</label>
+                        <input type="password" id="user-senha" placeholder="••••••••">
+                    </div>
+                    <div class="row">
+                        <button class="save">Salvar alterações</button>
+                    </div>
+                </div>
+
+                <!-- Configurações da loja -->
+                <div class="card">
+                    <div class="card-header">
+                        <img src="img/settings2.png" alt="Loja" class="icon-img">
+                        <h2>Configurações da Loja</h2>
+                    </div>
+
+                    <div class="row">
+                        <label>Nome da loja</label>
+                        <input type="text" id="loja-nome" value="Loja Exemplo">
+                    </div>
+
+                    <div class="row">
+                        <label>CNPJ</label>
+                        <input type="text" id="loja-cnpj" value="00.000.000/0001-00">
+                    </div>
+
+                    <div class="row">
+                        <label>Endereço</label>
+                        <input type="text" id="loja-endereco" value="Rua Central, 123 - Cidade">
+                    </div>
+
+                    <div>
+                        <label style="text-align: center;">Status</label>
+                        <span class="status-pill">Ativa</span>
+                    </div>
+
+                    <div class="row">
+                        <button class="save">Atualizar dados</button>
+                    </div>
+                </div>
+
+
+                <!-- 🔧 Configurações de Metas -->
+                <div class="card">
+                    <div class="card-header">
+                        <img src="img/goal2.png" alt="Metas" class="icon-img">
+                        <h3>Metas de Faturamento</h3>
+                    </div>
+
+                    <label>Meta Diária</label>
+                    <input id="meta-diaria" type="number" placeholder="Ex: 500">
+
+                    <label>Meta Semanal</label>
+                    <input id="meta-semanal" type="number" placeholder="Ex: 3000">
+
+                    <label>Meta Mensal</label>
+                    <input id="meta-mensal" type="number" placeholder="Ex: 10000">
+
+                    <label>Meta Anual</label>
+                    <input id="meta-anual" type="number" placeholder="Ex: 120000">
+
+                    <button id="salvar-metas" class="save" style="margin-top: 12px;">
+                        Salvar Metas
+                    </button>
+
+                    <p id="metas-atualizadas-em" style="font-size:0.85rem; color:var(--muted); margin-top:8px;"></p>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="dashboard" class="section">
+            <div class="card">
+
+                <div class="date-filter-pro">
+                    <div class="filter-header">
+                        <img src="img/filtering.png" alt="Calendário" class="filter-icon">
+                        <div class="filter-text">
+                            <h3>Período de Análise</h3>
+                            <span id="periodo-label">Exibindo: Todos os dados</span>
+                        </div>
+                    </div>
+
+                    <div class="filter-controls">
+                        <div class="filter-group">
+                            <label>Data inicial</label>
+                            <input type="date" id="rel-inicio">
+                        </div>
+
+                        <div class="filter-group">
+                            <label>Data final</label>
+                            <input type="date" id="rel-fim">
+                        </div>
+
+                        <button id="rel-aplicar">Aplicar</button>
+                        <button id="limpar-filtro" class="danger">Limpar</button>
+                    </div>
+
+                    <div class="filter-shortcuts">
+                        <button data-range="hoje">Hoje</button>
+                        <button data-range="semana">Últimos 7 dias</button>
+                        <button data-range="mes">Últimos 30 dias</button>
+                        <button data-range="ano">Ano Atual</button>
+                        <button data-range="personalizado">Personalizado</button>
+                    </div>
+                </div>
+
+                <div id="relatorio-container">
+                    <p style="color: var(--muted)">Selecione um período e clique em <b>Gerar Relatório</b>.</p>
+                </div>
+
+                <br>
+
+                <!-- 🔹 Barra de indicadores inteligentes -->
+                <div id="smart-indicators" class="smart-indicators">
+                    <!-- Os indicadores serão inseridos via JS -->
+                </div>
+
+                <div id="charts-container" style="margin-top: 20px;">
+                    <div id="chart-vendas" style="height: 350px; margin-bottom: 25px;"></div>
+                    <div id="chart-pagamentos" style="height: 350px; margin-bottom: 25px;"></div>
+                    <div id="chart-lucro" style="height: 350px;"></div>
+                </div>
+
+                <div class="rel-card-pro metas">
+                    <div class="rel-header">
+                        <img src="img/goal.png" alt="Ícone Metas" class="icon-img"
+                            style="width:32px; height:32px; margin-right:8px;">
+                        <h3>Metas e Desempenho</h3>
+                    </div>
+
+                    <div class="rel-body">
+                        <div class="meta-grid">
+                            <div id="chart-meta-diaria" class="meta-chart"></div>
+                            <div id="chart-meta-semanal" class="meta-chart"></div>
+                            <div id="chart-meta-mensal" class="meta-chart"></div>
+                            <div id="chart-meta-anual" class="meta-chart"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="relatorios" class="section">
+            <div class="card">
+                <h2>Relatórios</h2>
+                <p>Área destinada para relatórios e histórico de vendas.</p>
+            </div>
+        </section>
+
+        <section id="financeiro" class="section">
+            <div class="financeiro-container">
+
+                <!-- 🧾 Status do Plano (com header contendo ícone + título, mesmo padrão das outras abas) -->
+                <div class="card financeiro-status">
+                    <div class="status-info">
+                        <div class="card-header">
+                            <img src="img/cash-flow.png" alt="Financeiro" class="icon-img">
+                            <h2>Seus Planos</h2>
+                        </div>
+
+                        <p id="plano-vencimento">Carregando informações...</p>
+                        <span id="plano-status" class="status-pill">—</span>
+                    </div>
+
+                    <div class="status-value">
+                        <h4>Mensalidade</h4>
+                        <p class="valor" id="plano-valor">R$ — / mês</p>
+                        <button class="pay-btn" id="btnPagar">Efetuar Pagamento</button>
+                    </div>
+                </div>
+
+                <!-- 📊 Painel de informações -->
+                <div class="card financeiro-detalhes">
+                    <div class="detalhes-header">
+                        <img src="img/cash-machine.png" alt="Carteira" class="icon-img small">
+                        <h3>Resumo Financeiro</h3>
+                    </div>
+
+                    <div class="detalhes-grid">
+                        <div class="detalhe">
+                            <span>Último pagamento</span>
+                            <strong>05/11/2025</strong>
+                        </div>
+                        <div class="detalhe">
+                            <span>Próxima cobrança</span>
+                            <strong>05/12/2025</strong>
+                        </div>
+                        <div class="detalhe">
+                            <span>Status da assinatura</span>
+                            <strong style="color: var(--ok)">Ativa</strong>
+                        </div>
+                        <div class="detalhe">
+                            <span>Método de pagamento</span>
+                            <strong>Cartão de crédito</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 📜 Histórico -->
+                <div class="card financeiro-historico">
+                    <div class="detalhes-header">
+                        <img src="img/cashsss.png" alt="Histórico" class="icon-img small">
+                        <h3>Histórico de Pagamentos</h3>
+                    </div>
+
+                    <table class="tabela-financeiro">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Valor</th>
+                                <th>Status</th>
+                                <th>Forma de Pagamento</th>
+                                <th>Comprovante</th>
+                            </tr>
+                        </thead>
+                        <tbody id="financeiro-historico-body">
+                            <tr>
+                                <td>05/11/2025</td>
+                                <td>R$ 49,90</td>
+                                <td><span class="status-pill ativo">Pago</span></td>
+                                <td>Cartão</td>
+                                <td><button class="btn-comprovante">Baixar</button></td>
+                            </tr>
+                            <tr>
+                                <td>05/10/2025</td>
+                                <td>R$ 49,90</td>
+                                <td><span class="status-pill ativo">Pago</span></td>
+                                <td>Boleto</td>
+                                <td><button class="btn-comprovante">Baixar</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="ajuda" class="section">
+            <div class="card">
+                <h2>Ajuda</h2>
+                <p>Central de suporte e documentação.</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- SDK oficial do Mercado Pago -->
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
+
+    <!-- Seu script principal -->
+    <script type="module" src="./js/mercadopago.js"></script>
+    <!-- Biblioteca SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- SDK do Mercado Pago -->
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
+
+    <!-- Biblioteca de PDF (jsPDF) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script type="module">
+
+        import { onSnapshot } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+        import { abrirCheckout } from "./js/mercadopago.js";
+        import { collection, getDocs } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+        import {
+            auth,
+            db,
+            protectPage,
+            logout,
+            getUserName,
+            getUserRole
+        } from "./js/auth.js";
+        protectPage();
+
+        import {
+            doc,
+            getDoc,
+            setDoc
+        } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+        import {
+            onAuthStateChanged,
+            updateEmail,
+            updatePassword,
+            updateProfile
+        } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+        import * as echarts from "https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.esm.min.js";
+
+        // 🔒 Protege a página (redireciona se não estiver logado)
+        protectPage();
+
+        // 🎯 Elementos da interface
+        const userInfoEl = document.getElementById("userInfo");
+        const btnLogout = document.getElementById("btnLogout");
+
+        // Campos do perfil de usuário
+        const inputNome = document.querySelector('.card input[type="text"]');
+        const inputEmail = document.querySelector('.card input[type="email"]');
+        const inputSenha = document.querySelector('.card input[type="password"]');
+        const btnSalvarPerfil = document.querySelectorAll('.save')[0]; // primeiro botão "Salvar alterações"
+
+        // Campos da loja
+        const lojaInputs = document.querySelectorAll('.card:nth-of-type(2) input'); // 🆕 segunda card
+        const btnSalvarLoja = document.querySelectorAll('.save')[1]; // 🆕 botão "Atualizar dados"
+
+        // 🔹 Atualiza informações do usuário logado
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                try {
+                    const name = await getUserName();
+                    const role = await getUserRole();
+                    const uid = user.uid;
+                    const email = user.email;
+
+                    if (userInfoEl) userInfoEl.textContent = `${name} - ${role}`;
+
+                    // 🔹 Puxa dados completos do Firestore
+                    const ref = doc(db, "usuarios", uid);
+                    const snap = await getDoc(ref);
+
+                    if (snap.exists()) {
+                        const dados = snap.data();
+                        inputNome.value = dados.name || name || "";
+                        inputEmail.value = dados.email || email || "";
+                    } else {
+                        inputNome.value = name || "";
+                        inputEmail.value = email || "";
+                    }
+                } catch (err) {
+                    console.error("Erro ao carregar usuário:", err);
+                    if (userInfoEl) userInfoEl.textContent = "Erro ao carregar usuário";
+                }
+            } else {
+                if (userInfoEl) userInfoEl.textContent = "Carregando...";
+            }
+        });
+
+        // =====================================================
+        // 🧑‍💼 Atualizar perfil do usuário (com atualização visual automática)
+        // =====================================================
+        if (btnSalvarPerfil) {
+            btnSalvarPerfil.addEventListener("click", async () => {
+                const user = auth.currentUser;
+                if (!user) return alert("Usuário não autenticado.");
+
+                const novoNome = inputNome.value.trim();
+                const novoEmail = inputEmail.value.trim();
+                const novaSenha = inputSenha.value.trim();
+
+                try {
+                    // Atualiza no Auth
+                    if (novoNome && novoNome !== user.displayName) {
+                        await updateProfile(user, { displayName: novoNome });
+                    }
+
+                    if (novoEmail && novoEmail !== user.email) {
+                        await updateEmail(user, novoEmail);
+                    }
+
+                    if (novaSenha && novaSenha.length >= 6) {
+                        await updatePassword(user, novaSenha);
+                    }
+
+                    // Atualiza no Firestore
+                    await setDoc(doc(db, "usuarios", user.uid), {
+                        name: novoNome,
+                        email: novoEmail,
+                        atualizadoEm: new Date()
+                    }, { merge: true });
+
+                    // 🆕 Recarrega o usuário para refletir mudanças no painel
+                    await user.reload();
+                    const atualizado = auth.currentUser;
+                    const role = await getUserRole();
+
+                    if (userInfoEl) {
+                        userInfoEl.textContent = `${atualizado.displayName || atualizado.email} - ${role}`;
+                    }
+
+                    mostrarToast("✅ Perfil atualizado com sucesso!");
+                    inputSenha.value = "";
+                } catch (err) {
+                    console.error("Erro ao atualizar perfil:", err);
+                    if (err.code === "auth/requires-recent-login") {
+                        alert("⚠️ Faça login novamente para alterar email ou senha.");
+                    } else {
+                        alert("Erro ao atualizar. Verifique o console.");
+                    }
+                }
+            });
+        }
+
+        // ==========================================================
+        // ⚙️ CONFIGURAÇÕES DA LOJA
+        // ==========================================================
+        async function carregarConfiguracoes() {
+            try {
+                const ref = doc(db, "cfg", "config");
+                const snap = await getDoc(ref);
+
+                if (snap.exists()) {
+                    const dados = snap.data();
+
+                    // Atualiza os inputs
+                    lojaInputs[0].value = dados.nome || "";
+                    lojaInputs[1].value = dados.cnpj || "";
+                    lojaInputs[2].value = dados.endereco || "";
+
+                    // 🆕 Atualiza o nome da loja na navbar (brand)
+                    const brandTitle = document.querySelector(".brand h2");
+                    if (brandTitle) {
+                        brandTitle.textContent = dados.nome || "Minha Loja";
+                    }
+                } else {
+                    console.warn("Nenhum documento encontrado em cfg/config");
+                }
+            } catch (err) {
+                console.error("Erro ao carregar configurações:", err);
+            }
+        }
+
+        // 🆕 Atualizar configurações da loja
+        if (btnSalvarLoja) {
+            btnSalvarLoja.addEventListener("click", async () => {
+                try {
+                    const dados = {
+                        nome: lojaInputs[0]?.value || "",
+                        cnpj: lojaInputs[1]?.value || "",
+                        endereco: lojaInputs[2]?.value || "",
+                        atualizadoEm: new Date()
+                    };
+
+                    await setDoc(doc(db, "cfg", "config"), dados, { merge: true });
+                    mostrarToast("✅ Configurações da loja atualizadas!");
+                } catch (err) {
+                    console.error("Erro ao salvar configurações:", err);
+                    alert("Erro ao salvar. Verifique o console.");
+                }
+            });
+        }
+
+        // 🔸 Toast de feedback
+        function mostrarToast(msg) {
+            const toast = document.createElement("div");
+            toast.textContent = msg;
+            toast.style.position = "fixed";
+            toast.style.bottom = "20px";
+            toast.style.left = "50%";
+            toast.style.transform = "translateX(-50%)";
+            toast.style.background = "#00b894";
+            toast.style.color = "white";
+            toast.style.padding = "10px 20px";
+            toast.style.borderRadius = "8px";
+            toast.style.boxShadow = "0 2px 10px rgba(0,0,0,.2)";
+            toast.style.zIndex = "9999";
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2500);
+        }
+
+        // 🔹 Logout
+        if (btnLogout) {
+            btnLogout.addEventListener("click", () => {
+                localStorage.clear();
+                logout();
+            });
+        }
+
+        // 🔹 Carrega as configurações da loja ao abrir a página
+        window.addEventListener("DOMContentLoaded", carregarConfiguracoes);
+
+        // =====================================================
+        // 🧭 NAVEGAÇÃO SPA SEGURA
+        // =====================================================
+        const navLinks = document.querySelectorAll("nav a");
+        const sections = document.querySelectorAll(".section");
+        const pageTitle = document.getElementById("pageTitle");
+
+        navLinks.forEach(link => {
+            link.addEventListener("click", (e) => {
+                e.preventDefault();
+
+                // Atualiza ativo no menu
+                navLinks.forEach(l => l.classList.remove("active"));
+                link.classList.add("active");
+
+                // Troca de seção
+                const target = link.getAttribute("data-section");
+                sections.forEach(sec => sec.classList.remove("active"));
+                document.getElementById(target).classList.add("active");
+
+                // Atualiza título do cabeçalho
+                pageTitle.textContent = link.textContent.trim();
+
+                // Armazena seção atual (opcional)
+                localStorage.setItem("currentSection", target);
+
+                // Se o usuário abriu o Dashboard, gerar relatório automaticamente
+                // Se o usuário abriu o Dashboard, gera relatório automático
+                // Se o usuário abriu o Dashboard, aguarda autenticação antes de gerar relatório
+                if (target === "dashboard") {
+                    const tentarGerar = () => {
+                        if (auth.currentUser) gerarRelatorio();
+                        else setTimeout(tentarGerar, 500);
+                    };
+                    tentarGerar();
+                }
+            });
+        });
+
+
+
+        // Mantém a última seção aberta (persistência)
+        window.addEventListener("DOMContentLoaded", () => {
+            const last = localStorage.getItem("currentSection");
+            if (last && document.getElementById(last)) {
+                document.querySelector(`nav a[data-section="${last}"]`)?.click();
+            }
+        });
+
+
+        // Função auxiliar pra formatar valores em reais
+        function toBRL(v) {
+            return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+        }
+
+        // Função principal de relatório
+        async function gerarRelatorio() {
+            const container = document.getElementById("relatorio-container");
+            if (!container) return;
+
+            const user = auth.currentUser;
+            if (!user) {
+                container.innerHTML = "<p>Usuário não autenticado. Faça login novamente.</p>";
+                return;
+            }
+
+            container.innerHTML = "<p style='color: var(--muted)'>⏳ Carregando dados do relatório...</p>";
+
+            const inicio = document.getElementById("rel-inicio").value
+                ? new Date(document.getElementById("rel-inicio").value)
+                : null;
+            const fim = document.getElementById("rel-fim").value
+                ? new Date(document.getElementById("rel-fim").value + 'T23:59:59')
+                : null;
+
+            try {
+                // 🔹 Busca as vendas do Firestore
+                const querySnap = await getDocs(collection(db, "vendas"));
+                const vendas = querySnap.docs.map(doc => doc.data());
+
+                if (!vendas.length) {
+                    container.innerHTML = "<p>Nenhuma venda encontrada no banco de dados.</p>";
+                    return;
+                }
+
+                // 🔹 Filtra pelo período escolhido
+                const filtradas = vendas.filter(v => {
+                    const d = new Date(v.data);
+                    return (!inicio || d >= inicio) && (!fim || d <= fim);
+                });
+
+                if (!filtradas.length) {
+                    container.innerHTML = "<p>Nenhuma venda neste período.</p>";
+                    return;
+                }
+
+                const totalVendas = filtradas.reduce((a, v) => a + (+v.total || 0), 0);
+                const qtdVendas = filtradas.length;
+                const lucro = filtradas.reduce((a, v) =>
+                    a + (v.itens?.reduce((s, it) => s + ((it.preco - it.custo) * it.qtd), 0) || 0), 0);
+                const clientes = [...new Set(filtradas.map(v => v.cliente).filter(c => c))].length;
+                const ticketMedio = totalVendas / qtdVendas;
+                const lucroMedio = lucro / qtdVendas;
+                const margemLucro = (lucro / totalVendas) * 100;
+
+                const produtos = {};
+                filtradas.forEach(v => v.itens?.forEach(it => {
+                    produtos[it.nome] = (produtos[it.nome] || 0) + it.qtd;
+                }));
+                const topProduto = Object.entries(produtos).sort((a, b) => b[1] - a[1])[0];
+
+                const formas = {};
+                filtradas.forEach(v => { formas[v.pagto] = (formas[v.pagto] || 0) + 1; });
+                const topForma = Object.entries(formas).sort((a, b) => b[1] - a[1])[0];
+
+                const porCliente = {};
+                filtradas.forEach(v => { porCliente[v.cliente] = (porCliente[v.cliente] || 0) + v.total; });
+                const topClientes = Object.entries(porCliente).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+                const porDia = {};
+                filtradas.forEach(v => {
+                    const d = new Date(v.data).toLocaleDateString('pt-BR');
+                    porDia[d] = (porDia[d] || 0) + v.total;
+                });
+                const topDias = Object.entries(porDia).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+                container.innerHTML = `
+<div class="rel-grid">
+    <div class="rel-card"><h4>Faturamento</h4><p>${toBRL(totalVendas)}</p></div>
+    <div class="rel-card"><h4>Lucro líquido</h4><p>${toBRL(lucro)}</p></div>
+    <div class="rel-card"><h4>Ticket médio</h4><p>${toBRL(ticketMedio)}</p></div>
+    <div class="rel-card"><h4>Vendas</h4><p>${qtdVendas}</p></div>
+    <div class="rel-card"><h4>Clientes únicos</h4><p>${clientes}</p></div>
+    <div class="rel-card"><h4>Lucro/venda</h4><p>${toBRL(lucroMedio)}</p></div>
+    <div class="rel-card"><h4>Margem</h4><p>${margemLucro.toFixed(1)}%</p></div>
+</div>
+
+<!-- 🔹 Seções estilizadas -->
+<div class="rel-section">
+    <div class="rel-card-pro destaque">
+        <div class="rel-header">
+            <img src="img/info.png" alt="Info" class="icon-img" style="width:52px; height:52px; margin-right:8px;">
+            <h3>Informações</h3>
+        </div>
+        <div class="rel-body">
+            <div class="rel-item">
+                <span>Produto mais vendido</span>
+                <strong>${topProduto ? `${topProduto[0]} (${topProduto[1]} un)` : "—"}</strong>
+            </div>
+            <div class="rel-item">
+                <span>Forma de pagamento mais usada</span>
+                <strong>${topForma ? `${topForma[0]} (${topForma[1]})` : "—"}</strong>
+            </div>
+        </div>
+    </div>
+
+    <div class="rel-card-pro clientes">
+        <div class="rel-header">
+            <img src="img/trophy.png" alt="Champion" class="icon-img" style="width:64px; height:64px; margin-right:8px;">
+            <h3>Melhores Clientes</h3>
+        </div>
+        <div class="rel-body">
+            ${topClientes.length > 0
+                        ? topClientes
+                            .map(
+                                (c, i) => `
+                    <div class="rel-rank">
+                        <span class="rank-num">${i + 1}</span>
+                        <div class="rank-info">
+                            <span>${c[0] || "Cliente não identificado"}</span>
+                            <strong>${toBRL(c[1])}</strong>
+                        </div>
+                    </div>`
+                            )
+                            .join("")
+                        : "<p>Nenhum cliente encontrado.</p>"}
+        </div>
+    </div>
+
+    <div class="rel-card-pro dias">
+        <div class="rel-header">
+            <img src="img/calendar.png" alt="Calendário" class="icon-img" style="width:64px; height:64px; margin-right:8px;">
+            <h3>Melhores Dias</h3>
+        </div>
+        <div class="rel-body">
+            ${topDias.length > 0
+                        ? topDias
+                            .map(
+                                (d, i) => `
+                    <div class="rel-rank">
+                        <span class="rank-num">${i + 1}</span>
+                        <div class="rank-info">
+                            <span>${d[0]}</span>
+                            <strong>${toBRL(d[1])}</strong>
+                        </div>
+                    </div>`
+                            )
+                            .join("")
+                        : "<p>Nenhum dia registrado.</p>"}
+        </div>
+    </div>
+</div>
+`;
+
+                async function gerarGraficosMetas() {
+                    const snap = await getDoc(doc(db, "cfg", "metaVendas"));
+                    if (!snap.exists()) return;
+                    const m = snap.data();
+
+                    const querySnap = await getDocs(collection(db, "vendas"));
+                    const vendas = querySnap.docs.map(doc => doc.data());
+                    if (!vendas.length) return;
+
+                    // 🔹 Funções auxiliares
+                    const hoje = new Date();
+                    const mesmoDia = (d1, d2) => (
+                        d1.getDate() === d2.getDate() &&
+                        d1.getMonth() === d2.getMonth() &&
+                        d1.getFullYear() === d2.getFullYear()
+                    );
+
+                    const mesmoMes = (d1, d2) => (
+                        d1.getMonth() === d2.getMonth() &&
+                        d1.getFullYear() === d2.getFullYear()
+                    );
+
+                    const mesmoAno = (d1, d2) => d1.getFullYear() === d2.getFullYear();
+
+                    const getInicioDaSemana = (data) => {
+                        const d = new Date(data);
+                        const dia = d.getDay();
+                        const diff = d.getDate() - dia + (dia === 0 ? -6 : 1);
+                        return new Date(d.setDate(diff));
+                    };
+
+                    const inicioSemana = getInicioDaSemana(hoje);
+
+                    // 🔸 Filtros automáticos
+                    const vendasDia = vendas.filter(v => mesmoDia(new Date(v.data), hoje));
+                    const vendasSemana = vendas.filter(v => new Date(v.data) >= inicioSemana);
+                    const vendasMes = vendas.filter(v => mesmoMes(new Date(v.data), hoje));
+                    const vendasAno = vendas.filter(v => mesmoAno(new Date(v.data), hoje));
+
+                    // 🔸 Totais por período
+                    const totalDia = vendasDia.reduce((a, v) => a + (+v.total || 0), 0);
+                    const totalSemana = vendasSemana.reduce((a, v) => a + (+v.total || 0), 0);
+                    const totalMes = vendasMes.reduce((a, v) => a + (+v.total || 0), 0);
+                    const totalAno = vendasAno.reduce((a, v) => a + (+v.total || 0), 0);
+
+                    // 🔹 Renderizador do gráfico (mantém seu estilo)
+                    function renderChart(id, label, meta, total) {
+                        const el = document.getElementById(id);
+                        if (!el) return;
+
+                        const atingido = Math.min(total, meta || 0);
+                        const restante = Math.max((meta || 0) - total, 0);
+
+                        const chart = echarts.init(el);
+                        chart.setOption({
+                            title: {
+                                text: label,
+                                left: "center",
+                                top: 5,
+                                textStyle: {
+                                    color: "#333",
+                                    fontWeight: "600",
+                                    fontSize: 14
+                                }
+                            },
+                            tooltip: { trigger: "item", formatter: "{b}: {c} ({d}%)" },
+                            series: [{
+                                type: "pie",
+                                radius: "65%",
+                                center: ["50%", "58%"],
+                                data: [
+                                    {
+                                        value: atingido,
+                                        name: "Atingido",
+                                        itemStyle: {
+                                            color: {
+                                                type: "linear",
+                                                x: 0, y: 0, x2: 1, y2: 1,
+                                                colorStops: [
+                                                    { offset: 0, color: getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() },
+                                                    { offset: 1, color: getComputedStyle(document.documentElement).getPropertyValue('--accent-2').trim() }
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    {
+                                        value: restante,
+                                        name: "Restante",
+                                        itemStyle: {
+                                            color: getComputedStyle(document.documentElement).getPropertyValue('--muted').trim()
+                                        }
+                                    }
+                                ],
+                                label: { formatter: "{d}%", fontSize: 13 }
+                            }]
+                        });
+
+                        window.addEventListener("resize", () => chart.resize());
+                    }
+
+                    // 🧭 Renderiza cada meta com seu próprio total
+                    renderChart("chart-meta-diaria", "Meta Diária", m.diaria, totalDia);
+                    renderChart("chart-meta-semanal", "Meta Semanal", m.semanal, totalSemana);
+                    renderChart("chart-meta-mensal", "Meta Mensal", m.mensal, totalMes);
+                    renderChart("chart-meta-anual", "Meta Anual", m.anual, totalAno);
+                }
+
+                // 🔄 Chamada
+                gerarGraficosMetas();
+
+                function atualizarIndicadores(kpis) {
+                    const container = document.getElementById("smart-indicators");
+                    if (!container) return;
+
+                    container.innerHTML = `
+        <div class="smart-indicator ${kpis.lucro.diff >= 0 ? 'positive' : 'negative'}">
+            <div class="icon">
+                <img src="${kpis.lucro.diff >= 0 ? 'img/positivo.png' : 'img/negativo.png'}" 
+                     alt="${kpis.lucro.diff >= 0 ? 'positivo' : 'negativo'}" 
+                     style="width:32px; height:32px;">
+            </div>
+            <span>
+                <span class="value">${kpis.lucro.diff >= 0 ? '+ ' : '- '}${Math.abs(kpis.lucro.diff).toFixed(1)}%</span>
+                <span class="label">de Lucro comparado a semana anterior</span>
+            </span>
+        </div>
+
+        <div class="smart-indicator ${kpis.faturamento.diff >= 0 ? 'positive' : 'negative'}">
+            <div class="icon">
+                <img src="${kpis.faturamento.diff >= 0 ? 'img/positivo.png' : 'img/negativo.png'}" 
+                     alt="${kpis.faturamento.diff >= 0 ? 'positivo' : 'negativo'}" 
+                     style="width:32px; height:32px;">
+            </div>
+            <span>
+                <span class="value">${kpis.faturamento.diff >= 0 ? '+ ' : '- '}${Math.abs(kpis.faturamento.diff).toFixed(1)}%</span>
+                <span class="label">de Faturamento comparado ao mês anterior</span>
+            </span>
+        </div>
+    `;
+                }
+
+
+                // Exemplo simples de cálculo de diferença (adaptar conforme seus dados históricos)
+                function calcularDifSemanaPassada(valorAtual) {
+                    // Aqui você busca dados da semana anterior do Firestore
+                    // Exemplo dummy:
+                    const valorSemanaPassada = valorAtual * 0.88; // só para teste
+                    return ((valorAtual - valorSemanaPassada) / valorSemanaPassada) * 100;
+                }
+
+                function calcularDifMesAnterior(valorAtual) {
+                    // Aqui você busca dados do mês anterior do Firestore
+                    // Exemplo dummy:
+                    const valorMesAnterior = valorAtual * 1.08; // só para teste
+                    return ((valorAtual - valorMesAnterior) / valorMesAnterior) * 100;
+                }
+
+                // Chamada após calcular KPIs
+                const kpis = {
+                    lucro: { value: lucro, diff: calcularDifSemanaPassada(lucro) },
+                    faturamento: { value: totalVendas, diff: calcularDifMesAnterior(totalVendas) }
+                };
+
+                atualizarIndicadores(kpis);
+
+
+                // === GRÁFICOS PROFISSIONAIS (ECharts) ===
+
+                // 📅 1. Gráfico de Vendas por Dia (linha com degradê diagonal)
+                const vendasChart = echarts.init(document.getElementById('chart-vendas'));
+                vendasChart.setOption({
+                    title: {
+                        text: '{icon|}   Vendas por Dia',
+                        left: 'center',
+                        textStyle: {
+                            rich: {
+                                icon: {
+                                    height: 24,
+                                    backgroundColor: {
+                                        image: 'img/profit-up.png' // caminho da sua imagem
+                                    }
+                                }
+                            },
+                            color: '#333',
+                            fontWeight: '600'
+                        }
+                    },
+                    tooltip: { trigger: 'axis' },
+                    grid: { left: '3%', right: '4%', bottom: '8%', containLabel: true },
+                    xAxis: {
+                        type: 'category',
+                        data: topDias.map(d => d[0]),
+                        axisLabel: { rotate: 45, color: '#555' },
+                        axisLine: { lineStyle: { color: '#ccc' } }
+                    },
+                    yAxis: {
+                        type: 'value',
+                        name: 'R$',
+                        axisLine: { lineStyle: { color: '#ccc' } },
+                        splitLine: { lineStyle: { color: '#eee' } }
+                    },
+                    series: [{
+                        data: topDias.map(d => d[1]),
+                        type: 'line',
+                        smooth: true,
+                        symbol: 'circle',
+                        symbolSize: 8,
+                        lineStyle: { width: 3, color: '#3a86ff' },
+                        itemStyle: { color: '#3a86ff' },
+                        areaStyle: {
+                            // 🔹 Degradê linear no ângulo 135°
+                            color: new echarts.graphic.LinearGradient(0, 0, 1, 1, [
+                                { offset: 0, color: 'rgba(58, 134, 255, 0.8)' }, // topo - azul forte
+                                { offset: 1, color: 'rgba(0, 180, 216, 0.2)' }   // base - azul claro transparente
+                            ])
+                        }
+                    }]
+                });
+
+                // 💳 2. Formas de Pagamento (pizza)
+                const pagtoChart = echarts.init(document.getElementById('chart-pagamentos'));
+                pagtoChart.setOption({
+                    title: {
+                        text: '{icon|} Formas de Pagamento',
+                        left: 'center',
+                        textStyle: {
+                            rich: {
+                                icon: {
+                                    height: 24,
+                                    backgroundColor: {
+                                        image: 'img/pie-chart.png' // caminho da sua imagem
+                                    }
+                                }
+                            },
+                            color: '#333',
+                            fontWeight: '900'
+                        }
+                    },
+                    tooltip: { trigger: 'item' },
+                    legend: { bottom: 0 },
+                    series: [{
+                        name: 'Pagamentos',
+                        type: 'pie',
+                        radius: '60%',
+                        data: Object.entries(formas).map(([k, v]) => ({ name: k, value: v })),
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }]
+                });
+
+                // 💰 3. Lucro x Faturamento (barras com degradê profissional)
+                const lucroChart = echarts.init(document.getElementById('chart-lucro'));
+                lucroChart.setOption({
+                    title: {
+                        text: '{icon|} Lucro x Faturamento',
+                        left: 'center',
+                        textStyle: {
+                            rich: {
+                                icon: {
+                                    height: 24,
+                                    backgroundColor: {
+                                        image: 'img/bar-chart.png' // caminho da sua imagem
+                                    }
+                                }
+                            },
+                            color: '#333',
+                            fontWeight: '600'
+                        }
+                    },
+                    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+                    grid: { left: '3%', right: '4%', bottom: '8%', containLabel: true },
+                    xAxis: {
+                        type: 'category',
+                        data: ['Faturamento', 'Lucro'],
+                        axisLabel: { color: '#555' },
+                        axisLine: { lineStyle: { color: '#ccc' } }
+                    },
+                    yAxis: {
+                        type: 'value',
+                        name: 'R$',
+                        axisLine: { lineStyle: { color: '#ccc' } },
+                        splitLine: { lineStyle: { color: '#eee' } }
+                    },
+                    series: [{
+                        data: [totalVendas, lucro],
+                        type: 'bar',
+                        barWidth: '45%',
+                        itemStyle: {
+                            borderRadius: [6, 6, 0, 0],
+                            color: new echarts.graphic.LinearGradient(0, 0, 1, 1, [
+                                { offset: 0, color: '#3a86ff' },  // azul forte
+                                { offset: 1, color: '#00b4d8' }   // azul claro
+                            ])
+                        },
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 20,
+                                shadowColor: 'rgba(0, 180, 216, 0.4)',
+                                color: new echarts.graphic.LinearGradient(0, 0, 1, 1, [
+                                    { offset: 0, color: '#4895ef' },
+                                    { offset: 1, color: '#00b4d8' }
+                                ])
+                            }
+                        }
+                    }]
+
+                });
+
+
+                // 🔄 Responsividade
+                window.addEventListener('resize', () => {
+                    vendasChart.resize();
+                    pagtoChart.resize();
+                    lucroChart.resize();
+                });
+
+
+                document.querySelectorAll(".rel-toggle").forEach(btn => {
+                    btn.addEventListener("click", () => {
+                        const target = btn.dataset.target;
+                        const section = document.getElementById("rel-" + target);
+                        btn.classList.toggle("active");
+                        section.style.display = section.style.display === "none" ? "block" : "none";
+                    });
+                });
+            } catch {
+                container.innerHTML = "<p>Erro ao carregar dados do Firestore.</p>";
+            }
+        }
+
+        const labelPeriodo = document.getElementById("periodo-label");
+
+        // Botão principal
+        document.getElementById("rel-aplicar").addEventListener("click", async () => {
+            labelPeriodo.textContent = `Exibindo: ${formatarPeriodo()}`;
+            await gerarRelatorio();
+        });
+
+        // Botões rápidos
+        document.querySelectorAll(".filter-shortcuts button").forEach(btn => {
+            btn.addEventListener("click", async () => {
+                const hoje = new Date();
+                let inicio, fim = hoje;
+
+                if (btn.dataset.range === "hoje") {
+                    inicio = new Date();
+                } else if (btn.dataset.range === "semana") {
+                    inicio = new Date();
+                    inicio.setDate(hoje.getDate() - 6);
+                } else if (btn.dataset.range === "mes") {
+                    inicio = new Date();
+                    inicio.setDate(hoje.getDate() - 29);
+                } else if (btn.dataset.range === "ano") {
+                    inicio = new Date(hoje.getFullYear(), 0, 1);
+                } else if (btn.dataset.range === "personalizado") {
+                    document.getElementById("rel-inicio").focus();
+                    return;
+                }
+
+                document.getElementById("rel-inicio").value = toDateInput(inicio);
+                document.getElementById("rel-fim").value = toDateInput(fim);
+
+                document.querySelectorAll(".filter-shortcuts button").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+
+                labelPeriodo.textContent = `Exibindo: ${formatarPeriodo()}`;
+                await gerarRelatorio();
+            });
+        });
+
+        // Botão limpar
+        document.getElementById("limpar-filtro").addEventListener("click", async () => {
+            document.getElementById("rel-inicio").value = "";
+            document.getElementById("rel-fim").value = "";
+            document.querySelectorAll(".filter-shortcuts button").forEach(b => b.classList.remove("active"));
+            labelPeriodo.textContent = "Exibindo: Todos os dados";
+            await gerarRelatorio();
+        });
+
+        // Helpers
+        const toDateInput = d => d.toISOString().split("T")[0];
+        const formatarPeriodo = () => {
+            const inicio = document.getElementById("rel-inicio").value;
+            const fim = document.getElementById("rel-fim").value;
+            if (!inicio && !fim) return "Todos os dados";
+            const i = inicio ? new Date(inicio).toLocaleDateString("pt-BR") : "—";
+            const f = fim ? new Date(fim).toLocaleDateString("pt-BR") : "—";
+            return `${i} até ${f}`;
+        };
+        // 🎯 Atualiza relatório ao clicar no botão "Aplicar Filtro"
+        document.getElementById("rel-aplicar").addEventListener("click", async () => {
+            await gerarRelatorio(); // Reexecuta o relatório com base nas novas datas
+        });
+
+        // Salvar metas no Profile
+        // 🔹 Salvar metas no Firestore
+        document.getElementById("salvar-metas")?.addEventListener("click", async () => {
+            const diaria = Number(document.getElementById("meta-diaria").value) || 0;
+            const semanal = Number(document.getElementById("meta-semanal").value) || 0;
+            const mensal = Number(document.getElementById("meta-mensal").value) || 0;
+            const anual = Number(document.getElementById("meta-anual").value) || 0;
+
+            // Validação rápida
+            if ([diaria, semanal, mensal, anual].every(v => v === 0)) {
+                mostrarToast("⚠️ Preencha pelo menos uma meta antes de salvar.");
+                return;
+            }
+
+            const metas = {
+                diaria,
+                semanal,
+                mensal,
+                anual,
+                atualizadoEm: new Date().toISOString()
+            };
+
+            try {
+                await setDoc(doc(db, "cfg", "metaVendas"), metas, { merge: true });
+                mostrarToast("✅ Metas salvas com sucesso!");
+            } catch (err) {
+                console.error("Erro ao salvar metas:", err);
+                mostrarToast("❌ Erro ao salvar metas. Verifique o console.");
+            }
+        });
+
+
+        // 🔹 Carregar metas ao abrir a aba Profile
+        async function carregarMetasProfile() {
+            try {
+                const snap = await getDoc(doc(db, "cfg", "metaVendas"));
+                if (!snap.exists()) {
+                    console.warn("Nenhuma meta encontrada no Firestore.");
+                    return;
+                }
+
+                const m = snap.data();
+                document.getElementById("meta-diaria").value = m.diaria || "";
+                document.getElementById("meta-semanal").value = m.semanal || "";
+                document.getElementById("meta-mensal").value = m.mensal || "";
+                document.getElementById("meta-anual").value = m.anual || "";
+
+                // Mostra quando foi atualizado pela última vez
+                const atualizadoEl = document.getElementById("metas-atualizadas-em");
+                if (atualizadoEl && m.atualizadoEm) {
+                    const data = new Date(m.atualizadoEm).toLocaleString("pt-BR");
+                    atualizadoEl.textContent = `Última atualização: ${data}`;
+                }
+            } catch (err) {
+                console.error("Erro ao carregar metas:", err);
+            }
+        }
+
+        // 🔹 Carrega automaticamente ao entrar na aba Profile
+        document
+            .querySelector('[data-section="profile"]')
+            ?.addEventListener("click", carregarMetasProfile);
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const btn = document.getElementById('btnHome');
+            if (btn) {
+                btn.addEventListener('click', function () {
+                    window.location.href = 'index.html';
+                });
+            }
+        });
+
+
+
+
+        document.getElementById("btnPagar")?.addEventListener("click", () => {
+            Swal.fire({
+                title: "Confirmar pagamento?",
+                text: "Você está prestes a renovar sua assinatura por R$ 49,90",
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonText: "Sim, pagar agora",
+                cancelButtonText: "Cancelar",
+                confirmButtonColor: "#3a86ff",
+                cancelButtonColor: "#aaa"
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: "Aguarde...",
+                        text: "Estamos redirecionando para o pagamento seguro do Mercado Pago",
+                        allowOutsideClick: false,
+                        didOpen: () => Swal.showLoading()
+                    });
+
+                    // 🔹 Chama a função centralizada do Mercado Pago
+                    await abrirCheckout(49.90, "Assinatura SaaS Premium");
+
+                    Swal.close(); // Fecha o loading se o redirecionamento não ocorrer
+                }
+            });
+        });
+
+
+
+        // ==========================================================
+        // 💰 FINANCEIRO — Listener dinâmico e seguro (com debug)
+        // ==========================================================
+        console.log("🟡 Script Financeiro carregado... aguardando autenticação.");
+
+        onAuthStateChanged(auth, (user) => {
+            console.log("🔵 onAuthStateChanged disparado. Usuário:", user ? user.uid : "nenhum");
+            if (!user) return;
+
+            console.log("✅ Usuário autenticado, preparando Financeiro...");
+
+            const navFinanceiro = document.querySelector('[data-section="financeiro"]');
+            console.log("🔍 Elemento da aba Financeiro encontrado?", !!navFinanceiro);
+
+            // 🔹 Quando o usuário abrir a aba "Financeiro"
+            navFinanceiro?.addEventListener("click", () => {
+                console.log("🟢 Aba Financeiro clicada!");
+                carregarFinanceiro(user);
+            });
+
+            // 🔹 E também se já estiver ativa ao carregar
+            const sec = document.getElementById("financeiro");
+            if (sec && sec.classList.contains("active")) {
+                console.log("🟢 Financeiro já ativo na abertura!");
+                carregarFinanceiro(user);
+            }
+        });
+
+        function carregarFinanceiro(user) {
+            console.log("🚀 carregarFinanceiro() chamado para:", user.uid);
+
+            const ref = doc(db, "assinaturas", user.uid);
+            const planoVencimentoEl = document.querySelector(".financeiro-status p");
+            const planoStatusEl = document.querySelector(".financeiro-status .status-pill");
+            const planoValorEl = document.querySelector(".financeiro-status .valor");
+
+            planoVencimentoEl.textContent = "Carregando informações...";
+            planoStatusEl.textContent = "—";
+            planoValorEl.textContent = "R$ — / mês";
+
+            onSnapshot(ref, (snap) => {
+                console.log("📡 Snapshot recebido:", snap.exists() ? snap.data() : "nenhum documento");
+                if (!snap.exists()) {
+                    planoVencimentoEl.textContent = "Nenhuma assinatura ativa.";
+                    planoStatusEl.textContent = "Inativo";
+                    planoStatusEl.className = "status-pill inativo";
+                    planoValorEl.textContent = "R$ — / mês";
+                    // Limpa o resumo
+                    atualizarResumoFinanceiro({});
+                    return;
+                }
+
+                const data = snap.data();
+                const venc = new Date(data.vencimento);
+                const hoje = new Date();
+                const ativo = data.status === "ativo" && venc > hoje;
+                const vencFmt = venc.toLocaleDateString("pt-BR");
+
+                planoVencimentoEl.innerHTML = ativo
+                    ? `Seu plano está ativo até <strong>${vencFmt}</strong>`
+                    : `Seu plano expirou em <strong>${vencFmt}</strong>`;
+
+                planoStatusEl.textContent = ativo ? "Ativo" : "Vencido";
+                planoStatusEl.className = `status-pill ${ativo ? "ativo" : "inativo"}`;
+                planoValorEl.textContent = `R$ ${data.valor?.toFixed(2) || "—"} / mês`;
+
+                // 🧩 Atualiza também o resumo detalhado automaticamente
+                atualizarResumoFinanceiro(data);
+                carregarHistoricoPagamentos(user);
+            }, (err) => {
+                console.error("❌ Erro ao ler assinatura:", err);
+                planoVencimentoEl.textContent = "Erro ao carregar assinatura.";
+            });
+
+            // ==========================================================
+            // 💳 ATUALIZAÇÃO AUTOMÁTICA — Card "Resumo Financeiro"
+            // ==========================================================
+            function atualizarResumoFinanceiro(data) {
+                // Seletores dos elementos dentro do card
+                const ultPagEl = document.querySelector(".financeiro-detalhes .detalhes-grid .detalhe:nth-child(1) strong");
+                const proxCobEl = document.querySelector(".financeiro-detalhes .detalhes-grid .detalhe:nth-child(2) strong");
+                const statusEl = document.querySelector(".financeiro-detalhes .detalhes-grid .detalhe:nth-child(3) strong");
+                const metodoEl = document.querySelector(".financeiro-detalhes .detalhes-grid .detalhe:nth-child(4) strong");
+
+                // Converte datas em formato legível
+                const ultPag = data.ultimaAtualizacao ? new Date(data.ultimaAtualizacao).toLocaleDateString("pt-BR") : "—";
+                const proxCob = data.vencimento ? new Date(data.vencimento).toLocaleDateString("pt-BR") : "—";
+
+                // Atualiza os elementos do DOM
+                if (ultPagEl) ultPagEl.textContent = ultPag;
+                if (proxCobEl) proxCobEl.textContent = proxCob;
+                if (statusEl) {
+                    statusEl.textContent = data.status === "ativo" ? "Ativa" : "Inativa";
+                    statusEl.style.color = data.status === "ativo" ? "var(--ok)" : "var(--danger)";
+                }
+                if (metodoEl) metodoEl.textContent = data.metodoPagamento || "—";
+            }
+        }
+
+        // ==========================================================
+        // 📜 HISTÓRICO DE PAGAMENTOS — Firestore em tempo real
+        // ==========================================================
+        function carregarHistoricoPagamentos(user) {
+            const ref = doc(db, "assinaturas", user.uid);
+            const tabelaBody = document.getElementById("financeiro-historico-body");
+
+            if (!tabelaBody) return;
+
+            tabelaBody.innerHTML = `
+    <tr><td colspan="5" style="text-align:center; color:var(--muted)">⏳ Carregando histórico...</td></tr>
+  `;
+
+            onSnapshot(ref, (snap) => {
+                if (!snap.exists()) {
+                    tabelaBody.innerHTML = `
+        <tr><td colspan="5" style="text-align:center; color:var(--muted)">Nenhum pagamento encontrado.</td></tr>
+      `;
+                    return;
+                }
+
+                const d = snap.data();
+                const venc = new Date(d.vencimento).toLocaleDateString("pt-BR");
+                const ult = d.ultimaAtualizacao
+                    ? new Date(d.ultimaAtualizacao).toLocaleDateString("pt-BR")
+                    : "—";
+
+                tabelaBody.innerHTML = `
+      <tr>
+        <td>${ult}</td>
+        <td>R$ ${d.valor?.toFixed(2) || "—"}</td>
+        <td><span class="status-pill ${d.status === "ativo" ? "ativo" : "inativo"}">${d.status}</span></td>
+        <td>${d.metodoPagamento || "—"}</td>
+        <td><button class="btn-comprovante" disabled>Indisponível</button></td>
+      </tr>
+    `;
+                tabelaBody.innerHTML = `
+  <tr>
+    <td>${ult}</td>
+    <td>R$ ${d.valor?.toFixed(2) || "—"}</td>
+    <td><span class="status-pill ${d.status === "ativo" ? "ativo" : "inativo"}">${d.status}</span></td>
+    <td>${d.metodoPagamento || "—"}</td>
+    <td><button class="btn-comprovante">Baixar</button></td>
+  </tr>
+`;
+
+                // 🔹 Ao clicar no botão, gera o PDF
+                tabelaBody.querySelector(".btn-comprovante")?.addEventListener("click", async () => {
+                    const user = auth.currentUser;
+                    const dados = {
+                        id: user.uid,
+                        nome: user.displayName || "Usuário",
+                        email: user.email,
+                        data: d.ultimaAtualizacao,
+                        valor: d.valor,
+                        metodoPagamento: d.metodoPagamento,
+                        status: d.status,
+                    };
+                    gerarComprovantePDF(dados);
+                });
+            }, (err) => {
+                console.error("❌ Erro ao carregar histórico:", err);
+                tabelaBody.innerHTML = `
+      <tr><td colspan="5" style="text-align:center; color:var(--danger)">Erro ao carregar histórico.</td></tr>
+    `;
+            });
+        }
+
+
+        // ==========================================================
+        // 📄 GERADOR DE COMPROVANTE EMPRESARIAL (PDF PROFISSIONAL)
+        // ==========================================================
+        async function gerarComprovantePDF(dados) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF("p", "mm", "a4");
+
+            // 🎨 Paleta de cores
+            const azul = "#3a86ff";
+            const cinza = "#555";
+            const linhaY = (y) => doc.line(20, y, 190, y);
+
+            // ========================================================
+            // 🧾 CABEÇALHO
+            // ========================================================
+
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(22);
+            doc.setTextColor(azul);
+            doc.text("COMPROVANTE DE PAGAMENTO", 105, 25, { align: "center" });
+
+            doc.setFontSize(12);
+            doc.setTextColor(cinza);
+            doc.text("Emitido automaticamente pelo Sistema SaaS de Gestão", 105, 32, { align: "center" });
+
+            linhaY(37);
+
+            // ========================================================
+            // 💳 INFORMAÇÕES DO PAGAMENTO
+            // ========================================================
+            doc.setFontSize(14);
+            doc.setTextColor(azul);
+            doc.text("Informações do Pagamento", 20, 50);
+
+            doc.setDrawColor(58, 134, 255);
+            doc.roundedRect(18, 54, 174, 70, 4, 4);
+
+            doc.setFontSize(12);
+            doc.setTextColor("#000");
+
+            const info = [
+                ["Cliente:", dados.nome || "—"],
+                ["E-mail:", dados.email || "—"],
+                ["Data do Pagamento:", new Date(dados.data).toLocaleDateString("pt-BR")],
+                ["Valor:", `R$ ${dados.valor?.toFixed(2) || "—"}`],
+                ["Método de Pagamento:", dados.metodoPagamento || "—"],
+                ["Status:", dados.status?.toUpperCase() || "—"],
+                ["Código da Transação:", dados.id || "—"]
+            ];
+
+            let y = 64;
+            info.forEach(([label, value]) => {
+                doc.setFont("helvetica", "bold");
+                doc.text(label, 25, y);
+                doc.setFont("helvetica", "normal");
+                doc.text(value, 90, y);
+                y += 10;
+            });
+
+            // ========================================================
+            // 🟢 STATUS VISUAL (SEM EMOJIS)
+            // ========================================================
+            const pago = dados.status?.toLowerCase() === "ativo" || dados.status?.toLowerCase() === "pago";
+            const statusTexto = pago ? "PAGO" : "PENDENTE";
+            const statusColor = pago ? "#00b894" : "#e74c3c";
+
+            // Fundo do selo
+            doc.setFillColor(statusColor);
+            doc.roundedRect(140, 122, 50, 12, 3, 3, "F");
+
+            // Texto centralizado
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(12);
+            doc.setTextColor("#ffffff");
+            doc.text(statusTexto, 165, 130, { align: "center" });
+
+            // ========================================================
+            // 📱 QR CODE (Verificação)
+            // ========================================================
+            try {
+                const qrData = `https://seusite.com/comprovante/${dados.id}`;
+                const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(qrData)}`;
+                const qrImg = await fetch(qrUrl)
+                    .then(r => r.blob())
+                    .then(b => URL.createObjectURL(b));
+
+                doc.addImage(qrImg, "PNG", 30, 135, 40, 40);
+                doc.setTextColor(cinza);
+                doc.setFontSize(10);
+                doc.text("Verifique o comprovante online", 50, 182, { align: "center" });
+            } catch {
+                console.warn("⚠️ Falha ao gerar QR Code.");
+            }
+
+            // ========================================================
+            // 🧠 HASH DE AUTENTICAÇÃO
+            // ========================================================
+            const autenticidade = btoa(`${dados.id}-${dados.data}`).substring(0, 10);
+            doc.setFontSize(9);
+            doc.setTextColor("#666");
+            doc.text(`Código de autenticação: ${autenticidade}`, 105, 188, { align: "center" });
+
+            // ========================================================
+            // 🧾 RODAPÉ
+            // ========================================================
+            linhaY(260);
+            doc.setFontSize(10);
+            doc.setTextColor(cinza);
+            doc.text("Emitido por: Sistema SaaS de Gestão Empresarial", 105, 267, { align: "center" });
+            doc.text(`Data de emissão: ${new Date().toLocaleString("pt-BR")}`, 105, 273, { align: "center" });
+            doc.setTextColor(azul);
+            doc.text("www.sistemasaas.com.br", 105, 279, { align: "center" });
+
+            // ========================================================
+            // 💾 SALVAR PDF
+            // ========================================================
+            const nomeArquivo = `Comprovante-${dados.id || "Pagamento"}.pdf`;
+            doc.save(nomeArquivo);
+        }
+
+
+
+
+    </script>
+
+</body>
+
+>>>>>>> b946784e8a78f522c8f93f3abd24e8a546e57888
 </html>
