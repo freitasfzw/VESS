@@ -1,19 +1,28 @@
-// ✅ mercadopago.js — Versão corrigida e modular
-
+// ===================================================
+// 🔄 IMPORTS
+// ===================================================
 import { auth, db } from "./auth.js";
 import { doc, setDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 import Swal from "https://cdn.jsdelivr.net/npm/sweetalert2@11/+esm";
+import { pagamentoConfirmado } from "./plano.js";
 
-// 🔹 Suas chaves de teste (substitua pelas reais quando publicar)
+
+// ===================================================
+// 🔑 CHAVES MERCADO PAGO (DEV / TESTE)
+// ===================================================
 const MP_PUBLIC_KEY = "TEST-c48cd16b-954a-4676-96df-2c6d910e50b2";
 const MP_ACCESS_TOKEN = "TEST-1978446511430339-110709-511e58d36fc5c111b39292b33f25ca39-2713451330";
 
-// 🔹 Inicializa o SDK do Mercado Pago (somente para abrir o checkout)
+
+// ===================================================
+// 🚀 SDK MERCADO PAGO
+// ===================================================
 const mp = new MercadoPago(MP_PUBLIC_KEY, { locale: "pt-BR" });
 
-/**
- * Cria uma preferência de pagamento no Mercado Pago
- */
+
+// ===================================================
+// 💰 CRIAR PREFERÊNCIA DE PAGAMENTO
+// ===================================================
 export async function criarPagamento({ valor, titulo }) {
     try {
         const response = await fetch("https://api.mercadopago.com/checkout/preferences", {
@@ -47,38 +56,39 @@ export async function criarPagamento({ valor, titulo }) {
             throw new Error(data.message || "Erro na criação da preferência");
         }
 
-        console.log("✅ Preferência criada com sucesso:", data.id);
-        return data.init_point; // URL de checkout
+        console.log("✅ Preferência criada:", data.id);
+        return data.init_point;
     } catch (err) {
         console.error("Erro na criação do link:", err);
         return null;
     }
 }
 
-/**
- * Abre o checkout do Mercado Pago e simula o pagamento (modo DEV)
- */
+
+// ===================================================
+// 🧾 ABRIR CHECKOUT (DEV + PRODUÇÃO)
+// ===================================================
 export async function abrirCheckout(valor, titulo) {
     const link = await criarPagamento({ valor, titulo });
 
     if (link) {
         window.open(link, "_blank");
 
-        // 💡 Simulador de pagamento para ambiente local
+        // 🧪 Ambiente local — simula pagamento
         if (location.hostname === "127.0.0.1" || location.hostname === "localhost") {
             console.log("🧪 Simulando pagamento confirmado em 10 segundos...");
             setTimeout(async () => {
                 await pagamentoConfirmado();
             }, 10000);
         }
-    } else {
-        Swal.fire({
-            title: "Erro ao gerar link",
-            text: "Não foi possível iniciar o pagamento. Verifique suas chaves ou tente novamente.",
-            icon: "error",
-            confirmButtonColor: "#3a86ff"
-        });
-    }
-}
 
-import { pagamentoConfirmado } from "./plano.js";
+        return;
+    }
+
+    Swal.fire({
+        title: "Erro ao gerar link",
+        text: "Não foi possível iniciar o pagamento. Verifique suas chaves.",
+        icon: "error",
+        confirmButtonColor: "#3a86ff"
+    });
+}

@@ -1,0 +1,257 @@
+        :root {
+            --bg: #0b132b;
+            --card: #161f3a;
+            --muted: #a5b1d8;
+            --text: #eaf0ff;
+            --accent: #3a86ff;
+            --accent-2: #00c2ff;
+            --ok: #2ecc71;
+            --warn: #f39c12;
+            --danger: #e74c3c;
+            --radius: 16px;
+            --shadow: 0 10px 30px rgba(0, 0, 0, .25);
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        html,
+        body {
+            height: 100%
+        }
+
+        body {
+            margin: 0;
+            background: linear-gradient(180deg, #0b132b 0%, #101a3f 100%);
+            font-family: Inter, system-ui, Segoe UI, Roboto, Helvetica, Arial;
+            color: var(--text)
+        }
+
+        .wrap {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px
+        }
+
+        /* Layout centralizado */
+        .center {
+            min-height: 100%;
+            display: grid;
+            place-items: center;
+            padding: 24px
+        }
+
+        .card {
+            width: 100%;
+            max-width: 420px;
+            background: linear-gradient(180deg, #121b3a, #0f1731);
+            border: 1px solid rgba(255, 255, 255, .06);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow)
+        }
+
+        .card-header {
+            padding: 20px 20px 0 20px
+        }
+
+        .card-content {
+            padding: 20px
+        }
+
+        .brand {
+            display: flex;
+            gap: 12px;
+            align-items: center
+        }
+
+        .brand .logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            box-shadow: var(--shadow)
+        }
+
+        h1,
+        h2,
+        h3 {
+            margin: 0 0 8px 0
+        }
+
+        .muted {
+            color: var(--muted)
+        }
+
+        label {
+            display: block;
+            font-size: .9rem;
+            color: #c8d3ff;
+            margin: 10px 0 6px
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 14px;
+            background: #0a1533;
+            border: 1px solid rgba(255, 255, 255, .08);
+            border-radius: 12px;
+            color: var(--text);
+            outline: none
+        }
+
+        input::placeholder {
+            color: #8aa0d1
+        }
+
+        .row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: space-between
+        }
+
+        button {
+            appearance: none;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            color: #071021;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: var(--shadow)
+        }
+
+        button.ghost {
+            background: #0f1a3a;
+            color: var(--muted)
+        }
+
+        button.full {
+            width: 100%
+        }
+
+        button:disabled {
+            opacity: .7;
+            cursor: not-allowed
+        }
+
+        .helper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px
+        }
+
+        .link {
+            color: #8bb8ff;
+            text-decoration: none
+        }
+
+        .link:hover {
+            text-decoration: underline
+        }
+
+        /* Switch ("Lembrar de mim") */
+        .switch {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .switch input {
+            display: none
+        }
+
+        .switch .track {
+            width: 46px;
+            height: 26px;
+            background: #223160;
+            border-radius: 999px;
+            position: relative;
+            transition: .25s
+        }
+
+        .switch .thumb {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            top: 2px;
+            left: 2px;
+            background: white;
+            border-radius: 50%;
+            transition: .25s
+        }
+
+        .switch input:checked+.track {
+            background: linear-gradient(135deg, var(--accent), var(--accent-2))
+        }
+
+        .switch input:checked+.track .thumb {
+            transform: translateX(20px)
+        }
+
+        /* Alertas */
+        .alert {
+            display: none;
+            margin-top: 12px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-size: .95rem
+        }
+
+        .alert.error {
+            display: block;
+            background: rgba(231, 76, 60, .12);
+            border: 1px solid rgba(231, 76, 60, .35);
+            color: #ff9f9f
+        }
+
+        .alert.ok {
+            display: block;
+            background: rgba(46, 204, 113, .12);
+            border: 1px solid rgba(46, 204, 113, .35);
+            color: #9dffbf
+        }
+
+        /* Rodapé/credenciais bloqueadas */
+        .foot {
+            padding: 12px 20px;
+            border-top: 1px solid rgba(255, 255, 255, .06);
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+
+        .small {
+            font-size: .85rem;
+            color: var(--muted)
+        }
+
+        /* Loader dentro do botão */
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(0, 0, 0, .25);
+            border-top-color: #061019;
+            border-right-color: #061019;
+            border-radius: 50%;
+            display: inline-block;
+            animation: spin .8s linear infinite;
+            vertical-align: middle;
+            margin-right: 8px
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        /* Popover/tooltip simples */
+        .hint {
+            font-size: .85rem;
+            color: var(--muted);
+            margin-top: 6px
+        }

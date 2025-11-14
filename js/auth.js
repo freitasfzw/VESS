@@ -1,4 +1,6 @@
-// ✅ auth.js — Revisado e seguro para SaaS com verificação de assinatura
+// ===================================================
+// 🔥 auth.js — Revisado e seguro para SaaS com verificação de assinatura
+// ===================================================
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
 import {
@@ -20,7 +22,10 @@ import {
 import Swal from "https://cdn.jsdelivr.net/npm/sweetalert2@11/+esm";
 import { verificarAssinatura, monitorarAssinatura, redirecionarFinanceiro } from "./plano.js";
 
-// 🚀 Firebase Configuração
+
+// ===================================================
+// 🚀 CONFIGURAÇÃO DO FIREBASE
+// ===================================================
 const firebaseConfig = {
     apiKey: "AIzaSyAx8gOqPVeCztlMTWUsh048ejiNaFGnmAY",
     authDomain: "fluxo-de-caixa---base.firebaseapp.com",
@@ -31,10 +36,14 @@ const firebaseConfig = {
     measurementId: "G-LN7JHSJB86"
 };
 
-// 🔹 Inicializa Firebase
+
+// ===================================================
+// 🔧 INICIALIZAÇÃO
+// ===================================================
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+
 
 // ===================================================
 // 🔐 AUTENTICAÇÃO BÁSICA
@@ -54,8 +63,9 @@ export function resetPassword(email) {
     return sendPasswordResetEmail(auth, email);
 }
 
+
 // ===================================================
-// 🛡️ PROTEÇÃO DE PÁGINAS
+// 🛡️ PROTEÇÃO DE PÁGINAS / GUARD DE ROTA
 // ===================================================
 export function protectPage(redirectLogin = "login.html") {
     onAuthStateChanged(auth, async (user) => {
@@ -70,7 +80,6 @@ export function protectPage(redirectLogin = "login.html") {
         if (!planoOk) {
             document.body.classList.add("bloqueado");
 
-            // Evita erro se DOM ainda não estiver pronto
             setTimeout(() => {
                 redirecionarFinanceiro();
             }, 300);
@@ -84,7 +93,7 @@ export function protectPage(redirectLogin = "login.html") {
             });
         }
 
-        // Sempre inicia o monitoramento (ativa/desativa em tempo real)
+        // 🔄 Monitoramento em tempo real
         monitorarAssinatura(user.uid);
     });
 }
@@ -94,6 +103,7 @@ export function redirectIfLoggedIn(redirectTo = "index.html") {
         if (user) window.location.href = redirectTo;
     });
 }
+
 
 // ===================================================
 // 👤 DADOS DO USUÁRIO
@@ -139,4 +149,3 @@ export async function getUserName() {
         return user.email;
     }
 }
-
