@@ -1,12 +1,23 @@
 // ===================================================
 // 🔥 FIREBASE INDEX.JS — Controle principal do painel
 // ===================================================
-
-import { protectPage, logout, getUserName, getUserRole, auth, db } from "./js/auth.js";
+import { DB } from "./db.js";
+import { protectPage, logout, getUserName, getUserRole, auth, db } from "./auth.js";
 protectPage();
-
+import {
+    selecionarAba,
+    renderTabs,
+    listarProdutos,
+    listarCaixa,
+    listarFechamentos,
+    atualizarGraficos,
+} from "./index.js";
+import { state, mostrarPopup } from "./global.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 import { collection, getDocs, doc, getDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+// Alias para seleção de múltiplos elementos, igual ao Cash.js / UmbrellaJS
+const $$ = (selector) => document.querySelectorAll(selector);
 
 const userInfoEl = document.getElementById("userInfo");
 const btnLogout = document.getElementById("btnLogout");
@@ -51,7 +62,6 @@ btnLogout.addEventListener("click", () => {
 function applyPermissions(role) {
     const permissions = {
         Administrador: ["sec-pos", "sec-estoque", "sec-caixa", "sec-relatorios", "sec-fechamentos", "sec-config", "sec-ajuda"],
-        Gerente: ["sec-pos", "sec-estoque", "sec-caixa", "sec-relatorios"],
         Caixa: ["sec-pos"]
     };
 
@@ -192,7 +202,6 @@ async function init() {
     });
 
     listarProdutos();
-    renderCfg();
     listarCaixa();
     atualizarGraficos();
 

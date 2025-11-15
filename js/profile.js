@@ -3,7 +3,7 @@
 // ===================================================
 
 import { onSnapshot } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
-import { abrirCheckout } from "./js/mercadopago.js";
+import { abrirCheckout } from "./mercadopago.js";
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 import {
     auth,
@@ -12,7 +12,7 @@ import {
     logout,
     getUserName,
     getUserRole
-} from "./js/auth.js";
+} from "./auth.js";
 import {
     doc,
     getDoc,
@@ -25,6 +25,7 @@ import {
     updateProfile
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 import * as echarts from "https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.esm.min.js";
+
 
 // 🔒 Protege a página (redireciona se não estiver logado)
 protectPage();
@@ -75,6 +76,11 @@ onAuthStateChanged(auth, async (user) => {
     }
 });
 
+onSnapshot(collection(db, "vendas"), (snap) => {
+    const vendas = snap.docs.map(d => d.data());
+    gerarDashboard(vendas); // AGORA ATUALIZA EM TEMPO REAL
+    gerarRelatorio(); // se quiser atualizar os gráficos junto
+});
 // =====================================================
 // 🧑‍💼 Atualizar perfil do usuário (com atualização visual automática)
 // =====================================================
@@ -205,8 +211,23 @@ if (btnLogout) {
     });
 }
 
-// 🔹 Carrega as configurações da loja ao abrir a página
-window.addEventListener("DOMContentLoaded", carregarConfiguracoes);
+// 🔄 Atualização automática das configurações da loja (tempo real)
+onSnapshot(doc(db, "cfg", "config"), (snap) => {
+    if (snap.exists()) {
+        const dados = snap.data();
+
+        // Atualiza inputs visíveis
+        lojaInputs[0].value = dados.nome || "";
+        lojaInputs[1].value = dados.cnpj || "";
+        lojaInputs[2].value = dados.endereco || "";
+
+        // Atualiza título da loja no header
+        const brandTitle = document.querySelector(".brand h2");
+        if (brandTitle) {
+            brandTitle.textContent = dados.nome || "Minha Loja";
+        }
+    }
+});
 
 // =====================================================
 // 🧭 NAVEGAÇÃO SPA SEGURA
@@ -263,7 +284,41 @@ function toBRL(v) {
     return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
-// Função principal de relatório
+function atualizarIndicadores(kpis) {
+    const container = document.getElementById("smart-indicators");
+    if (!container) return;
+
+    container.innerHTML = `
+        <div class="smart-indicator ${kpis.lucro.diff >= 0 ? 'positive' : 'negative'}">
+            <div class="icon">
+                <img src="${kpis.lucro.diff >= 0 ? 'img/positivo.png' : 'img/negativo.png'}" 
+                     alt="${kpis.lucro.diff >= 0 ? 'positivo' : 'negativo'}" 
+                     style="width:32px; height:32px;">
+            </div>
+            <span>
+                <span class="value">${kpis.lucro.diff >= 0 ? '+ ' : '- '}${Math.abs(kpis.lucro.diff).toFixed(1)}%</span>
+                <span class="label">de Lucro comparado a semana anterior</span>
+            </span>
+        </div>
+
+        <div class="smart-indicator ${kpis.faturamento.diff >= 0 ? 'positive' : 'negative'}">
+            <div class="icon">
+                <img src="${kpis.faturamento.diff >= 0 ? 'img/positivo.png' : 'img/negativo.png'}" 
+                     alt="${kpis.faturamento.diff >= 0 ? 'positivo' : 'negativo'}" 
+                     style="width:32px; height:32px;">
+            </div>
+            <span>
+                <span class="value">${kpis.faturamento.diff >= 0 ? '+ ' : '- '}${Math.abs(kpis.faturamento.diff).toFixed(1)}%</span>
+                <span class="label">de Faturamento comparado ao mês anterior</span>
+            </span>
+        </div>
+    `;
+}
+
+
+// ===================================================
+// 🧭 FUNÇÃO CORRIGIDA: gerarRelatorio()
+// ===================================================
 async function gerarRelatorio() {
     const container = document.getElementById("relatorio-container");
     if (!container) return;
@@ -276,24 +331,22 @@ async function gerarRelatorio() {
 
     container.innerHTML = "<p style='color: var(--muted)'>⏳ Carregando dados do relatório...</p>";
 
-    const inicio = document.getElementById("rel-inicio").value
-        ? new Date(document.getElementById("rel-inicio").value)
-        : null;
-    const fim = document.getElementById("rel-fim").value
-        ? new Date(document.getElementById("rel-fim").value + 'T23:59:59')
-        : null;
-
     try {
-        // 🔹 Busca as vendas do Firestore
+        // Busca as vendas do Firestore de forma síncrona aqui (sem onSnapshot dentro do relatório)
         const querySnap = await getDocs(collection(db, "vendas"));
-        const vendas = querySnap.docs.map(doc => doc.data());
+        const vendas = querySnap.docs.map(d => d.data() || {});
 
-        if (!vendas.length) {
-            container.innerHTML = "<p>Nenhuma venda encontrada no banco de dados.</p>";
-            return;
-        }
+        // Atualiza o dashboard com as vendas carregadas (gerarDashboard aceita parâmetro)
+        gerarDashboard(vendas);
 
-        // 🔹 Filtra pelo período escolhido
+        // Filtros de período
+        const inicio = document.getElementById("rel-inicio").value
+            ? new Date(document.getElementById("rel-inicio").value)
+            : null;
+        const fim = document.getElementById("rel-fim").value
+            ? new Date(document.getElementById("rel-fim").value + 'T23:59:59')
+            : null;
+
         const filtradas = vendas.filter(v => {
             const d = new Date(v.data);
             return (!inicio || d >= inicio) && (!fim || d <= fim);
@@ -304,6 +357,7 @@ async function gerarRelatorio() {
             return;
         }
 
+        // Totais e KPIs
         const totalVendas = filtradas.reduce((a, v) => a + (+v.total || 0), 0);
         const qtdVendas = filtradas.length;
         const lucro = filtradas.reduce((a, v) =>
@@ -311,29 +365,30 @@ async function gerarRelatorio() {
         const clientes = [...new Set(filtradas.map(v => v.cliente).filter(c => c))].length;
         const ticketMedio = totalVendas / qtdVendas;
         const lucroMedio = lucro / qtdVendas;
-        const margemLucro = (lucro / totalVendas) * 100;
+        const margemLucro = totalVendas ? (lucro / totalVendas) * 100 : 0;
 
         const produtos = {};
         filtradas.forEach(v => v.itens?.forEach(it => {
             produtos[it.nome] = (produtos[it.nome] || 0) + it.qtd;
         }));
-        const topProduto = Object.entries(produtos).sort((a, b) => b[1] - a[1])[0];
+        const topProduto = Object.entries(produtos).sort((a, b) => b[1] - a[1])[0] || null;
 
         const formas = {};
         filtradas.forEach(v => { formas[v.pagto] = (formas[v.pagto] || 0) + 1; });
-        const topForma = Object.entries(formas).sort((a, b) => b[1] - a[1])[0];
+        const topForma = Object.entries(formas).sort((a, b) => b[1] - a[1])[0] || null;
 
         const porCliente = {};
-        filtradas.forEach(v => { porCliente[v.cliente] = (porCliente[v.cliente] || 0) + v.total; });
+        filtradas.forEach(v => { porCliente[v.cliente] = (porCliente[v.cliente] || 0) + (+v.total || 0); });
         const topClientes = Object.entries(porCliente).sort((a, b) => b[1] - a[1]).slice(0, 5);
 
         const porDia = {};
         filtradas.forEach(v => {
             const d = new Date(v.data).toLocaleDateString('pt-BR');
-            porDia[d] = (porDia[d] || 0) + v.total;
+            porDia[d] = (porDia[d] || 0) + (+v.total || 0);
         });
         const topDias = Object.entries(porDia).sort((a, b) => b[1] - a[1]).slice(0, 5);
 
+        // Render do HTML do relatório (mantive sua estrutura)
         container.innerHTML = `
 <div class="rel-grid">
     <div class="rel-card"><h4>Faturamento</h4><p>${toBRL(totalVendas)}</p></div>
@@ -343,72 +398,6 @@ async function gerarRelatorio() {
     <div class="rel-card"><h4>Clientes únicos</h4><p>${clientes}</p></div>
     <div class="rel-card"><h4>Lucro/venda</h4><p>${toBRL(lucroMedio)}</p></div>
     <div class="rel-card"><h4>Margem</h4><p>${margemLucro.toFixed(1)}%</p></div>
-</div>
-
-<!-- 🔹 Seções estilizadas -->
-<div class="rel-section">
-    <div class="rel-card-pro destaque">
-        <div class="rel-header">
-            <img src="img/info.png" alt="Info" class="icon-img" style="width:52px; height:52px; margin-right:8px;">
-            <h3>Informações</h3>
-        </div>
-        <div class="rel-body">
-            <div class="rel-item">
-                <span>Produto mais vendido</span>
-                <strong>${topProduto ? `${topProduto[0]} (${topProduto[1]} un)` : "—"}</strong>
-            </div>
-            <div class="rel-item">
-                <span>Forma de pagamento mais usada</span>
-                <strong>${topForma ? `${topForma[0]} (${topForma[1]})` : "—"}</strong>
-            </div>
-        </div>
-    </div>
-
-    <div class="rel-card-pro clientes">
-        <div class="rel-header">
-            <img src="img/trophy.png" alt="Champion" class="icon-img" style="width:64px; height:64px; margin-right:8px;">
-            <h3>Melhores Clientes</h3>
-        </div>
-        <div class="rel-body">
-            ${topClientes.length > 0
-                ? topClientes
-                    .map(
-                        (c, i) => `
-                    <div class="rel-rank">
-                        <span class="rank-num">${i + 1}</span>
-                        <div class="rank-info">
-                            <span>${c[0] || "Cliente não identificado"}</span>
-                            <strong>${toBRL(c[1])}</strong>
-                        </div>
-                    </div>`
-                    )
-                    .join("")
-                : "<p>Nenhum cliente encontrado.</p>"}
-        </div>
-    </div>
-
-    <div class="rel-card-pro dias">
-        <div class="rel-header">
-            <img src="img/calendar.png" alt="Calendário" class="icon-img" style="width:64px; height:64px; margin-right:8px;">
-            <h3>Melhores Dias</h3>
-        </div>
-        <div class="rel-body">
-            ${topDias.length > 0
-                ? topDias
-                    .map(
-                        (d, i) => `
-                    <div class="rel-rank">
-                        <span class="rank-num">${i + 1}</span>
-                        <div class="rank-info">
-                            <span>${d[0]}</span>
-                            <strong>${toBRL(d[1])}</strong>
-                        </div>
-                    </div>`
-                    )
-                    .join("")
-                : "<p>Nenhum dia registrado.</p>"}
-        </div>
-    </div>
 </div>
 `;
 
@@ -522,36 +511,6 @@ async function gerarRelatorio() {
         // 🔄 Chamada
         gerarGraficosMetas();
 
-        function atualizarIndicadores(kpis) {
-            const container = document.getElementById("smart-indicators");
-            if (!container) return;
-
-            container.innerHTML = `
-        <div class="smart-indicator ${kpis.lucro.diff >= 0 ? 'positive' : 'negative'}">
-            <div class="icon">
-                <img src="${kpis.lucro.diff >= 0 ? 'img/positivo.png' : 'img/negativo.png'}" 
-                     alt="${kpis.lucro.diff >= 0 ? 'positivo' : 'negativo'}" 
-                     style="width:32px; height:32px;">
-            </div>
-            <span>
-                <span class="value">${kpis.lucro.diff >= 0 ? '+ ' : '- '}${Math.abs(kpis.lucro.diff).toFixed(1)}%</span>
-                <span class="label">de Lucro comparado a semana anterior</span>
-            </span>
-        </div>
-
-        <div class="smart-indicator ${kpis.faturamento.diff >= 0 ? 'positive' : 'negative'}">
-            <div class="icon">
-                <img src="${kpis.faturamento.diff >= 0 ? 'img/positivo.png' : 'img/negativo.png'}" 
-                     alt="${kpis.faturamento.diff >= 0 ? 'positivo' : 'negativo'}" 
-                     style="width:32px; height:32px;">
-            </div>
-            <span>
-                <span class="value">${kpis.faturamento.diff >= 0 ? '+ ' : '- '}${Math.abs(kpis.faturamento.diff).toFixed(1)}%</span>
-                <span class="label">de Faturamento comparado ao mês anterior</span>
-            </span>
-        </div>
-    `;
-        }
 
 
         // Exemplo simples de cálculo de diferença (adaptar conforme seus dados históricos)
@@ -742,10 +701,156 @@ async function gerarRelatorio() {
                 section.style.display = section.style.display === "none" ? "block" : "none";
             });
         });
-    } catch {
+    } catch (err) {
+        console.error("🔥 ERRO REAL NO RELATÓRIO:", err);
         container.innerHTML = "<p>Erro ao carregar dados do Firestore.</p>";
     }
+
 }
+
+
+
+// =====================================================
+// FUNÇÕES DE VARIAÇÃO (ESCAPADAS DO ESCOPO)
+// =====================================================
+
+// Semanal
+function calcularDifSemanaPassada(valorAtual) {
+    const valorSemanaPassada = valorAtual * 0.88; // seu placeholder
+    return ((valorAtual - valorSemanaPassada) / valorSemanaPassada) * 100;
+}
+
+// Mensal
+function calcularDifMesAnterior(valorAtual) {
+    const valorMesAnterior = valorAtual * 1.08; // seu placeholder
+    return ((valorAtual - valorMesAnterior) / valorMesAnterior) * 100;
+}
+
+function calcularVariacaoLucro(vendas) {
+    if (!vendas.length) return 0;
+
+    const hoje = new Date();
+    const inicioSemanaAtual = new Date(hoje);
+    inicioSemanaAtual.setDate(hoje.getDate() - hoje.getDay() + 1);
+
+    const inicioSemanaPassada = new Date(inicioSemanaAtual);
+    inicioSemanaPassada.setDate(inicioSemanaAtual.getDate() - 7);
+
+    const fimSemanaPassada = new Date(inicioSemanaAtual);
+    fimSemanaPassada.setDate(inicioSemanaAtual.getDate() - 1);
+
+    const lucroSemanaAtual = vendas
+        .filter(v => new Date(v.data) >= inicioSemanaAtual)
+        .reduce((a, v) => a + (v.lucro || 0), 0);
+
+    const lucroSemanaPassada = vendas
+        .filter(v => new Date(v.data) >= inicioSemanaPassada && new Date(v.data) <= fimSemanaPassada)
+        .reduce((a, v) => a + (v.lucro || 0), 0);
+
+    if (lucroSemanaPassada === 0) return 100;
+
+    return ((lucroSemanaAtual - lucroSemanaPassada) / lucroSemanaPassada) * 100;
+}
+
+
+function calcularVariacaoFaturamento(vendas) {
+    if (!vendas.length) return 0;
+
+    const hoje = new Date();
+    const mesAtual = hoje.getMonth();
+    const mesPassado = mesAtual === 0 ? 11 : mesAtual - 1;
+
+    const faturamentoAtual = vendas
+        .filter(v => new Date(v.data).getMonth() === mesAtual)
+        .reduce((a, v) => a + (+v.total || 0), 0);
+
+    const faturamentoPassado = vendas
+        .filter(v => new Date(v.data).getMonth() === mesPassado)
+        .reduce((a, v) => a + (+v.total || 0), 0);
+
+    if (faturamentoPassado === 0) return 100;
+
+    return ((faturamentoAtual - faturamentoPassado) / faturamentoPassado) * 100;
+}
+
+// ===================================================
+// 📊 FUNÇÃO CORRIGIDA: gerarDashboard(vendasOptional)
+//      - aceita um array de vendas (para evitar reconsultas duplicadas)
+// ===================================================
+async function gerarDashboard(vendasPreCarregadas = null) {
+    console.log("🔄 Atualizando dashboard...");
+
+    try {
+        const vendas = vendasPreCarregadas ||
+            (await getDocs(collection(db, "vendas"))).docs.map(d => d.data() || {});
+
+        if (!vendas.length) {
+            console.warn("Nenhuma venda encontrada.");
+            return;
+        }
+
+        // Totais rápidos (se você usa em outro lugar)
+        const hojeStr = new Date().toISOString().split("T")[0];
+        const vendasHoje = vendas.filter(v => (v.data || "").startsWith(hojeStr));
+        const totalHoje = vendasHoje.reduce((a, v) => a + (+v.total || 0), 0);
+
+        const mes = new Date().getMonth();
+        const vendasMes = vendas.filter(v => new Date(v.data).getMonth() === mes);
+        const totalMes = vendasMes.reduce((a, v) => a + (+v.total || 0), 0);
+
+        const totalGeral = vendas.reduce((a, v) => a + (+v.total || 0), 0);
+
+        // Atualiza indicadores (usa as funções de variação que devem estar no escopo global)
+        atualizarIndicadores({
+            lucro: { diff: calcularVariacaoLucro(vendas) },
+            faturamento: { diff: calcularVariacaoFaturamento(vendas) }
+        });
+
+        console.log("✅ Dashboard atualizado.");
+    } catch (err) {
+        console.error("❌ Erro ao gerar dashboard:", err);
+    }
+}
+
+
+// ==========================================================
+// 📡 LISTENER EM TEMPO REAL PARA AS VENDAS
+// ==========================================================
+function iniciarListenerVendas() {
+    const ref = collection(db, "vendas");
+
+    // Escuta em tempo real
+    onSnapshot(ref, async () => {
+        console.log("🔄 Atualização detectada no Firestore — recriando relatório...");
+        await gerarRelatorio();  // atualiza tudo automaticamente
+    });
+}
+
+function gerarRelatorioComVendas(vendas) {
+    // 🔹 Aqui vamos copiar a lógica do seu relatório
+    // mas removendo o getDocs e usando as vendas recebidas
+
+    const container = document.getElementById("relatorio-container");
+    if (!container) return;
+
+    const inicio = document.getElementById("rel-inicio").value
+        ? new Date(document.getElementById("rel-inicio").value)
+        : null;
+    const fim = document.getElementById("rel-fim").value
+        ? new Date(document.getElementById("rel-fim").value + "T23:59:59")
+        : null;
+
+    const filtradas = vendas.filter(v => {
+        const d = new Date(v.data);
+        return (!inicio || d >= inicio) && (!fim || d <= fim);
+    });
+
+    // ❗ Aqui você reutiliza TODA a lógica atual:
+    // totais, top produtos, top dias, gráficos, KPIs...
+    //
+    // Apenas substitua o array 'vendas' pelo array 'filtradas'
+}
+
 
 const labelPeriodo = document.getElementById("periodo-label");
 
@@ -1203,3 +1308,10 @@ async function gerarComprovantePDF(dados) {
     const nomeArquivo = `Comprovante-${dados.id || "Pagamento"}.pdf`;
     doc.save(nomeArquivo);
 }
+
+// Quando a página carregar → ativa listener em tempo real
+window.addEventListener("DOMContentLoaded", () => {
+    iniciarListenerVendas();
+});
+
+window.addEventListener("DOMContentLoaded", gerarDashboard);

@@ -2,7 +2,7 @@
 // 📊 ATUALIZAÇÃO DE GRÁFICOS
 // ===================================================
 
-function atualizarGraficos() {
+export function atualizarGraficos() {
     gerarRelatorio(); // ✅ só redireciona para o relatório
 }
 
@@ -52,8 +52,8 @@ const abas = [
     { id: 'sec-relatorios', label: 'Relatórios' },
     { id: 'sec-fechamentos', label: 'Fechamentos' },
 ];
-function renderTabs() { const nav = $('#tabs'); nav.innerHTML = ''; abas.forEach(a => { const b = document.createElement('button'); b.className = 'tab-btn'; b.textContent = a.label; b.dataset.target = a.id; b.onclick = () => selecionarAba(a.id); nav.appendChild(b) }); selecionarAba('sec-pos') }
-function selecionarAba(id) {
+export function renderTabs() { const nav = $('#tabs'); nav.innerHTML = ''; abas.forEach(a => { const b = document.createElement('button'); b.className = 'tab-btn'; b.textContent = a.label; b.dataset.target = a.id; b.onclick = () => selecionarAba(a.id); nav.appendChild(b) }); selecionarAba('sec-pos') }
+export function selecionarAba(id) {
     $$('.section').forEach(s => s.style.display = 'none'); // esconde todas
     const sec = $('#' + id);
     if (!sec) return;
@@ -70,7 +70,7 @@ function selecionarAba(id) {
 // ===================================================
 // 📦 ESTOQUE — CRUD COMPLETO
 // ===================================================
-function listarProdutos() { const tbody = $('#tblProdutos tbody'); const q = $('#buscaProduto').value.toLowerCase(); const cat = $('#filtroCategoria').value.toLowerCase(); tbody.innerHTML = ''; state.produtos.filter(p => (p.nome.toLowerCase().includes(q) || p.codigo.toLowerCase().includes(q) || p.categoria.toLowerCase().includes(q)) && (cat ? p.categoria.toLowerCase().includes(cat) : true)).forEach(p => { const tr = document.createElement('tr'); tr.innerHTML = `<td>${p.codigo}</td><td>${p.nome}</td><td>${p.categoria}</td><td class='right'>${fmtBRL(+p.custo || 0)}</td><td class='right'>${fmtBRL(+p.preco || 0)}</td><td class='right'>${p.estoque ?? 0}</td><td class='right'><button class='ghost' onclick="editarProduto('${p.id}')">Editar</button> <button class='danger' onclick="excluirProduto('${p.id}')">Excluir</button></td>`; tbody.appendChild(tr) }) }
+export function listarProdutos() { const tbody = $('#tblProdutos tbody'); const q = $('#buscaProduto').value.toLowerCase(); const cat = $('#filtroCategoria').value.toLowerCase(); tbody.innerHTML = ''; state.produtos.filter(p => (p.nome.toLowerCase().includes(q) || p.codigo.toLowerCase().includes(q) || p.categoria.toLowerCase().includes(q)) && (cat ? p.categoria.toLowerCase().includes(cat) : true)).forEach(p => { const tr = document.createElement('tr'); tr.innerHTML = `<td>${p.codigo}</td><td>${p.nome}</td><td>${p.categoria}</td><td class='right'>${fmtBRL(+p.custo || 0)}</td><td class='right'>${fmtBRL(+p.preco || 0)}</td><td class='right'>${p.estoque ?? 0}</td><td class='right'><button class='ghost' onclick="editarProduto('${p.id}')">Editar</button> <button class='danger' onclick="excluirProduto('${p.id}')">Excluir</button></td>`; tbody.appendChild(tr) }) }
 
 function editarProduto(id) { const p = state.produtos.find(x => x.id === id) || { id: uid(), codigo: '', nome: '', categoria: '', estoque: 0, custo: 0, preco: 0 }; $('#p-cod').value = p.codigo; $('#p-nome').value = p.nome; $('#p-cat').value = p.categoria; $('#p-estoque').value = p.estoque; $('#p-custo').value = p.custo; $('#p-preco').value = p.preco; $('#p-salvar').onclick = (e) => { e.preventDefault(); p.codigo = $('#p-cod').value.trim(); p.nome = $('#p-nome').value.trim(); p.categoria = $('#p-cat').value.trim(); p.estoque = +$('#p-estoque').value || 0; p.custo = +$('#p-custo').value || 0; p.preco = +$('#p-preco').value || 0; const i = state.produtos.findIndex(x => x.id === p.id); if (i >= 0) state.produtos[i] = p; else state.produtos.push(p); DB.set('produtos', state.produtos); syncFirebase(); $('#dlgProduto').close(); listarProdutos(); mostrarPopup('Produto salvo!') }; $('#dlgProduto').showModal() }
 function excluirProduto(id) { if (!confirm('Excluir produto?')) return; state.produtos = state.produtos.filter(p => p.id !== id); DB.set('produtos', state.produtos); listarProdutos(); mostrarPopup('Produto excluído') }
@@ -225,7 +225,7 @@ document.getElementById('btnStopScan')?.addEventListener('click', stopScanner);
 // ===================================================
 // 💵 CAIXA (LISTAGEM + CRUD + STATUS)
 // ===================================================
-function listarCaixa() { const tbody = $('#tblCaixa tbody'); tbody.innerHTML = ''; const ini = $('#cx-inicio').value ? new Date($('#cx-inicio').value) : null; const fim = $('#cx-fim').value ? new Date($('#cx-fim').value + 'T23:59:59') : null; let saldo = 0; state.caixa.filter(l => { const d = new Date(l.data); return (!ini || d >= ini) && (!fim || d <= fim) }).sort((a, b) => new Date(a.data) - new Date(b.data)).forEach(l => { saldo += (+l.entrada || 0) - (+l.saida || 0); const tr = document.createElement('tr'); tr.innerHTML = `<td>${new Date(l.data).toLocaleDateString()}</td><td>${l.desc}</td><td>${l.cat}</td><td class='right'>${l.entrada ? fmtBRL(+l.entrada) : ''}</td><td class='right'>${l.saida ? fmtBRL(+l.saida) : ''}</td><td class='right'><button class='danger' onclick="excluirLancamento('${l.id}')">Excluir</button></td>`; tbody.appendChild(tr) }); const elSaldo = $('#cx-saldo'); elSaldo.textContent = `Saldo: ${fmtBRL(saldo)}`; elSaldo.className = 'pill ' + (saldo > 0 ? 'status-ok' : (saldo < 0 ? 'status-danger' : 'status-warn')) }
+export function listarCaixa() { const tbody = $('#tblCaixa tbody'); tbody.innerHTML = ''; const ini = $('#cx-inicio').value ? new Date($('#cx-inicio').value) : null; const fim = $('#cx-fim').value ? new Date($('#cx-fim').value + 'T23:59:59') : null; let saldo = 0; state.caixa.filter(l => { const d = new Date(l.data); return (!ini || d >= ini) && (!fim || d <= fim) }).sort((a, b) => new Date(a.data) - new Date(b.data)).forEach(l => { saldo += (+l.entrada || 0) - (+l.saida || 0); const tr = document.createElement('tr'); tr.innerHTML = `<td>${new Date(l.data).toLocaleDateString()}</td><td>${l.desc}</td><td>${l.cat}</td><td class='right'>${l.entrada ? fmtBRL(+l.entrada) : ''}</td><td class='right'>${l.saida ? fmtBRL(+l.saida) : ''}</td><td class='right'><button class='danger' onclick="excluirLancamento('${l.id}')">Excluir</button></td>`; tbody.appendChild(tr) }); const elSaldo = $('#cx-saldo'); elSaldo.textContent = `Saldo: ${fmtBRL(saldo)}`; elSaldo.className = 'pill ' + (saldo > 0 ? 'status-ok' : (saldo < 0 ? 'status-danger' : 'status-warn')) }
 function excluirLancamento(id) {
     if (!confirm('Excluir lançamento?')) return;
 
@@ -497,7 +497,7 @@ aplicarEstadoCaixa();
 
 $('#cx-aplicar')?.addEventListener('click', listarCaixa);
 
-function listarFechamentos() {
+export function listarFechamentos() {
     const tb = document.querySelector('#tblFechamentos tbody');
     if (!tb) return;
     tb.innerHTML = '';
@@ -672,10 +672,36 @@ function gerarRelatorio() {
 $('#rel-aplicar')?.addEventListener('click', gerarRelatorio);
 
 // ===================================================
-// ⚙️ CONFIGURAÇÕES DO SISTEMA
+// 💾 SALVAR CONFIGURAÇÕES
 // ===================================================
-function renderCfg() { $('#cfg-nome').value = state.cfg.nome || ''; $('#cfg-cnpj').value = state.cfg.cnpj || ''; $('#cfg-ie').value = state.cfg.ie || ''; $('#cfg-endereco').value = state.cfg.endereco || ''; $('#cfg-icms').value = state.cfg.icms || 0; $('#cfg-iss').value = state.cfg.iss || 0; $('#cfg-controlaEstoque').checked = !!state.cfg.controlaEstoque }
-$('#btnSalvarCfg')?.addEventListener('click', () => { state.cfg = { nome: $('#cfg-nome').value.trim(), cnpj: $('#cfg-cnpj').value.trim(), ie: $('#cfg-ie').value.trim(), endereco: $('#cfg-endereco').value.trim(), icms: +$('#cfg-icms').value || 0, iss: +$('#cfg-iss').value || 0, controlaEstoque: $('#cfg-controlaEstoque').checked }; DB.set('cfg', state.cfg); syncFirebase(); mostrarPopup('Configurações salvas') });
+const btnSalvarCfg = document.getElementById("btnSalvarCfg");
+
+if (btnSalvarCfg) {
+    btnSalvarCfg.addEventListener("click", () => {
+
+        const nome       = document.getElementById("cfg-nome")?.value.trim() || '';
+        const cnpj       = document.getElementById("cfg-cnpj")?.value.trim() || '';
+        const ie         = document.getElementById("cfg-ie")?.value.trim() || '';
+        const endereco   = document.getElementById("cfg-endereco")?.value.trim() || '';
+        const icms       = +document.getElementById("cfg-icms")?.value || 0;
+        const iss        = +document.getElementById("cfg-iss")?.value || 0;
+        const controla   = document.getElementById("cfg-controlaEstoque")?.checked || false;
+
+        state.cfg = {
+            nome,
+            cnpj,
+            ie,
+            endereco,
+            icms,
+            iss,
+            controlaEstoque: controla
+        };
+
+        DB.set("cfg", state.cfg);
+        syncFirebase();
+        mostrarPopup("Configurações salvas!");
+    });
+}
 
 // ===================================================
 // 🧾 DANFE (SIMULADA)

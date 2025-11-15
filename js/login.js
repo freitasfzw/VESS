@@ -1,7 +1,7 @@
 // ===================================================
 // 🔄 IMPORTS
 // ===================================================
-import { login, resetPassword, redirectIfLoggedIn } from "./js/auth.js";
+import { login, resetPassword, redirectIfLoggedIn } from "./auth.js";
 
 
 // ===================================================

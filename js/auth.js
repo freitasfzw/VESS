@@ -128,7 +128,6 @@ export async function getUserRole() {
 
 export const permissions = {
     Administrador: ["sec-pos", "sec-estoque", "sec-caixa", "sec-relatorios", "sec-fechamentos", "sec-config", "sec-ajuda"],
-    Gerente: ["sec-pos", "sec-caixa", "sec-relatorios"],
     Caixa: ["sec-pos"]
 };
 
