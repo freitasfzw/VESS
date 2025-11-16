@@ -95,7 +95,6 @@ function applyPermissions(role) {
 // 🔄 SINCRONIZAÇÃO COMPLETA (LOCAL → FIREBASE)
 // ===================================================
 async function syncFirebase() {
-    console.log("syncFirebase: enviado → db:", !!db);
 
     try {
         // Produtos

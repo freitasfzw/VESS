@@ -778,7 +778,6 @@ function calcularVariacaoFaturamento(vendas) {
 //      - aceita um array de vendas (para evitar reconsultas duplicadas)
 // ===================================================
 async function gerarDashboard(vendasPreCarregadas = null) {
-    console.log("🔄 Atualizando dashboard...");
 
     try {
         const vendas = vendasPreCarregadas ||
@@ -806,7 +805,6 @@ async function gerarDashboard(vendasPreCarregadas = null) {
             faturamento: { diff: calcularVariacaoFaturamento(vendas) }
         });
 
-        console.log("✅ Dashboard atualizado.");
     } catch (err) {
         console.error("❌ Erro ao gerar dashboard:", err);
     }
@@ -821,8 +819,7 @@ function iniciarListenerVendas() {
 
     // Escuta em tempo real
     onSnapshot(ref, async () => {
-        console.log("🔄 Atualização detectada no Firestore — recriando relatório...");
-        await gerarRelatorio();  // atualiza tudo automaticamente
+       await gerarRelatorio();  // atualiza tudo automaticamente
     });
 }
 
@@ -1023,33 +1020,25 @@ document.getElementById("btnPagar")?.addEventListener("click", () => {
 // ==========================================================
 // 💰 FINANCEIRO — Listener dinâmico e seguro (com debug)
 // ==========================================================
-console.log("🟡 Script Financeiro carregado... aguardando autenticação.");
 
 onAuthStateChanged(auth, (user) => {
-    console.log("🔵 onAuthStateChanged disparado. Usuário:", user ? user.uid : "nenhum");
     if (!user) return;
 
-    console.log("✅ Usuário autenticado, preparando Financeiro...");
-
     const navFinanceiro = document.querySelector('[data-section="financeiro"]');
-    console.log("🔍 Elemento da aba Financeiro encontrado?", !!navFinanceiro);
 
     // 🔹 Quando o usuário abrir a aba "Financeiro"
     navFinanceiro?.addEventListener("click", () => {
-        console.log("🟢 Aba Financeiro clicada!");
         carregarFinanceiro(user);
     });
 
     // 🔹 E também se já estiver ativa ao carregar
     const sec = document.getElementById("financeiro");
     if (sec && sec.classList.contains("active")) {
-        console.log("🟢 Financeiro já ativo na abertura!");
         carregarFinanceiro(user);
     }
 });
 
 function carregarFinanceiro(user) {
-    console.log("🚀 carregarFinanceiro() chamado para:", user.uid);
 
     const ref = doc(db, "assinaturas", user.uid);
     const planoVencimentoEl = document.querySelector(".financeiro-status p");
@@ -1061,7 +1050,6 @@ function carregarFinanceiro(user) {
     planoValorEl.textContent = "R$ — / mês";
 
     onSnapshot(ref, (snap) => {
-        console.log("📡 Snapshot recebido:", snap.exists() ? snap.data() : "nenhum documento");
         if (!snap.exists()) {
             planoVencimentoEl.textContent = "Nenhuma assinatura ativa.";
             planoStatusEl.textContent = "Inativo";

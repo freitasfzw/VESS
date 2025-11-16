@@ -146,7 +146,6 @@ export async function pagamentoConfirmado() {
             confirmButtonColor: "#3a86ff",
         });
 
-        console.log("✅ Plano atualizado no Firestore");
     } catch (err) {
         console.error("❌ Erro ao atualizar plano:", err);
 

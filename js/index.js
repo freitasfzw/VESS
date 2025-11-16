@@ -1,7 +1,7 @@
 import { db } from "./auth.js";
 import { auth } from "./auth.js";
 import { loadFromFirebase, syncFirebase } from "./firebase-index.js";
-import { doc, setDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+import { doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
 onAuthStateChanged(auth, (user) => {
@@ -177,13 +177,10 @@ function editarProduto(id) {
 
         // --- 1) SALVA NO localStorage (DB.set) COM LOG ---
         try {
-            console.log('[DEBUG] Salvando no localStorage (DB.set) -> produtos', p);
             DB.set('produtos', state.produtos);
             // Verifica se gravou lendo imediatamente
             const check = JSON.parse(localStorage.getItem('produtos'));
-            console.log('[DEBUG] localStorage agora tem produtos count =', (Array.isArray(check) ? check.length : '-'), check && check.find(x => x.id === p.id) ? 'produto presente' : 'produto ausente');
         } catch (err) {
-            console.error('[ERRO] Não foi possível gravar no localStorage:', err);
             mostrarPopup('Erro ao salvar localmente (veja console).');
             return;
         }
@@ -192,16 +189,13 @@ function editarProduto(id) {
         try {
             // Confere usuário autenticado
             const user = (typeof auth !== 'undefined' && auth.currentUser) ? auth.currentUser : null;
-            console.log('[DEBUG] auth.currentUser ->', user ? user.uid : user);
 
             if (!user) {
                 console.warn('[WARN] Usuário não autenticado no momento. Salvamento no Firestore será tentado quando fizer login.');
                 mostrarPopup('Produto salvo localmente. Faça login para sincronizar com o servidor.');
             } else {
                 // IMPORTANTE: usa setDoc direto para essa coleção 'produtos' (salva apenas este documento)
-                console.log('[DEBUG] Gravando produto no Firestore (coleção "produtos")', p.id);
-                await setDoc(doc(db, "produtos", p.id), p);
-                console.log('[OK] Produto sincronizado no Firestore:', p.id);
+               await setDoc(doc(db, "produtos", p.id), p);
                 mostrarPopup('Produto salvo e sincronizado!');
             }
         } catch (err) {
@@ -218,14 +212,24 @@ function editarProduto(id) {
     $('#dlgProduto').showModal();
 }
 
-function excluirProduto(id) {
+async function excluirProduto(id) {
     if (!confirm('Excluir produto?')) return;
 
+    // 1 — Apaga no estado local
     state.produtos = state.produtos.filter(p => p.id !== id);
-
     DB.set('produtos', state.produtos);
+
+    // 2 — Apaga no Firebase
+    try {
+        await deleteDoc(doc(db, "produtos", id));
+        mostrarPopup('Produto excluído!');
+    } catch (err) {
+        console.error("ERRO ao excluir do Firestore:", err);
+        mostrarPopup("Erro ao excluir no Firebase!");
+    }
+
+    // 3 — Atualiza UI
     listarProdutos();
-    mostrarPopup('Produto excluído');
 }
 
 window.excluirProduto = excluirProduto;
@@ -276,9 +280,9 @@ $('#pos-finalizar')?.addEventListener('click', () => {
         cliente: $('#pos-cliente').value.trim()
     };
 
-// ===================================================
-//  DESCONTAR ESTOQUE (CORRETO)
-// ===================================================
+    // ===================================================
+    //  DESCONTAR ESTOQUE (CORRETO)
+    // ===================================================
     if (state.cfg.controlaEstoque) {
         for (const it of venda.itens) {
             const produto = state.produtos.find(p => p.codigo === it.codigo);
@@ -290,7 +294,7 @@ $('#pos-finalizar')?.addEventListener('click', () => {
         DB.set("produtos", state.produtos);
     }
 
-        (async () => {
+    (async () => {
         await syncFirebase();
     })();
 
@@ -305,9 +309,7 @@ $('#pos-finalizar')?.addEventListener('click', () => {
     (async () => {
         try {
             await setDoc(doc(db, "vendas", venda.id), venda);
-            console.log("Venda sincronizada no Firestore.");
         } catch (e) {
-            console.error("Erro ao sincronizar venda:", e);
         }
     })();
 

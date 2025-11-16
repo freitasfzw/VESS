@@ -56,7 +56,6 @@ export async function criarPagamento({ valor, titulo }) {
             throw new Error(data.message || "Erro na criação da preferência");
         }
 
-        console.log("✅ Preferência criada:", data.id);
         return data.init_point;
     } catch (err) {
         console.error("Erro na criação do link:", err);
@@ -76,8 +75,7 @@ export async function abrirCheckout(valor, titulo) {
 
         // 🧪 Ambiente local — simula pagamento
         if (location.hostname === "127.0.0.1" || location.hostname === "localhost") {
-            console.log("🧪 Simulando pagamento confirmado em 10 segundos...");
-            setTimeout(async () => {
+           setTimeout(async () => {
                 await pagamentoConfirmado();
             }, 10000);
         }
