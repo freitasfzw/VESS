@@ -1,5 +1,6 @@
 import { db } from "./auth.js";
 import { auth } from "./auth.js";
+import { mostrarPopup } from "./global.js";
 import { loadFromFirebase, syncFirebase } from "./firebase-index.js";
 import { doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
@@ -39,7 +40,6 @@ const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 const $ = (sel, root = document) => root.querySelector(sel);
 const fmtBRL = (v = 0) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 const uid = () => Math.random().toString(36).slice(2, 9);
-function mostrarPopup(msg) { const p = $('#popup'); p.textContent = msg; p.classList.add('show'); setTimeout(() => p.classList.remove('show'), 1800) }
 const sameDay = (iso, base = new Date()) => { const d = new Date(iso), b = new Date(base); return d.getFullYear() === b.getFullYear() && d.getMonth() === b.getMonth() && d.getDate() === b.getDate(); };
 const dayBounds = (base = new Date()) => {
     const d0 = new Date(base.getFullYear(), base.getMonth(), base.getDate());

@@ -1176,3 +1176,36 @@
     body {
         transition: filter 0.3s ease;
     }
+
+    /* POPUP SUAVE E MODERNO */
+    .popup-alert {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%) translateY(40px);
+        padding: 14px 22px;
+        background: linear-gradient(135deg, #4A90E2, #357ABD);
+        color: white;
+        font-size: 15px;
+        font-weight: 500;
+        border-radius: 12px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+        opacity: 0;
+        backdrop-filter: blur(6px);
+        z-index: 9999;
+        transition:
+            opacity 0.35s ease,
+            transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* ANIMAÇÃO DE ENTRADA */
+    .popup-show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+
+    /* ANIMAÇÃO DE SAÍDA */
+    .popup-hide {
+        opacity: 0;
+        transform: translateX(-50%) translateY(40px);
+    }

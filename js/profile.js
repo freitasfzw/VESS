@@ -25,6 +25,7 @@ import {
     updateProfile
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 import * as echarts from "https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.esm.min.js";
+import { mostrarPopup } from "./global.js";
 
 
 // 🔒 Protege a página (redireciona se não estiver logado)
@@ -123,7 +124,7 @@ if (btnSalvarPerfil) {
                 userInfoEl.textContent = `${atualizado.displayName || atualizado.email} - ${role}`;
             }
 
-            mostrarToast("✅ Perfil atualizado com sucesso!");
+            mostrarPopup("Perfil atualizado com sucesso!");
             inputSenha.value = "";
         } catch (err) {
             console.error("Erro ao atualizar perfil:", err);
@@ -177,30 +178,12 @@ if (btnSalvarLoja) {
             };
 
             await setDoc(doc(db, "cfg", "config"), dados, { merge: true });
-            mostrarToast("✅ Configurações da loja atualizadas!");
+            mostrarPopup("Configurações da loja atualizadas!");
         } catch (err) {
             console.error("Erro ao salvar configurações:", err);
             alert("Erro ao salvar. Verifique o console.");
         }
     });
-}
-
-// 🔸 Toast de feedback
-function mostrarToast(msg) {
-    const toast = document.createElement("div");
-    toast.textContent = msg;
-    toast.style.position = "fixed";
-    toast.style.bottom = "20px";
-    toast.style.left = "50%";
-    toast.style.transform = "translateX(-50%)";
-    toast.style.background = "#00b894";
-    toast.style.color = "white";
-    toast.style.padding = "10px 20px";
-    toast.style.borderRadius = "8px";
-    toast.style.boxShadow = "0 2px 10px rgba(0,0,0,.2)";
-    toast.style.zIndex = "9999";
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 2500);
 }
 
 // 🔹 Logout
@@ -923,7 +906,7 @@ document.getElementById("salvar-metas")?.addEventListener("click", async () => {
 
     // Validação rápida
     if ([diaria, semanal, mensal, anual].every(v => v === 0)) {
-        mostrarToast("⚠️ Preencha pelo menos uma meta antes de salvar.");
+        mostrarPopup("Preencha pelo menos uma meta antes de salvar.");
         return;
     }
 
@@ -937,10 +920,10 @@ document.getElementById("salvar-metas")?.addEventListener("click", async () => {
 
     try {
         await setDoc(doc(db, "cfg", "metaVendas"), metas, { merge: true });
-        mostrarToast("✅ Metas salvas com sucesso!");
+        mostrarPopup("Metas salvas com sucesso!");
     } catch (err) {
         console.error("Erro ao salvar metas:", err);
-        mostrarToast("❌ Erro ao salvar metas. Verifique o console.");
+        mostrarPopup("Erro ao salvar metas. Verifique o console.");
     }
 });
 

@@ -9,10 +9,15 @@ export const state = {
 
 export function mostrarPopup(msg) {
     const popup = document.createElement("div");
-    popup.className = "popup-alert";
+    popup.className = "popup-alert popup-show";
     popup.textContent = msg;
 
     document.body.appendChild(popup);
 
-    setTimeout(() => popup.remove(), 2500);
+    // Remove suavemente
+    setTimeout(() => {
+        popup.classList.remove("popup-show");
+        popup.classList.add("popup-hide");
+        setTimeout(() => popup.remove(), 400);
+    }, 2200);
 }
