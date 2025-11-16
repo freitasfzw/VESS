@@ -50,17 +50,17 @@
                         <input id="senha" name="senha" type="password" placeholder="••••••••"
                             autocomplete="current-password" required />
                         <button type="button" id="togglePass" class="ghost" aria-label="Mostrar/ocultar senha"
-                            style="position:absolute;right:6px;top:6px;padding:8px 10px">👁️</button>
+                            style="position:absolute;right:6px;top:6px;padding:8px 10px">
+                            <svg id="iconPass" width="22" height="22" viewBox="0 0 24 24" fill="none">
+                                <path
+                                    d="M12 5C7 5 2.73 8.11 1 12C2.73 15.89 7 19 12 19C17 19 21.27 15.89 23 12C21.27 8.11 17 5 12 5Z"
+                                    stroke="#3A86FF" stroke-width="2" />
+                                <circle cx="12" cy="12" r="3" stroke="#3A86FF" stroke-width="2" />
+                            </svg>
+                        </button>
                     </div>
 
-                    <!-- Opção "Lembrar de mim" -->
-                    <div class="helper">
-                        <label class="switch" title="Manter sessão ativa neste dispositivo">
-                            <input id="lembrar" type="checkbox" />
-                            <span class="track"><span class="thumb"></span></span>
-                            <span class="muted">Lembrar de mim</span>
-                        </label>
-                    </div>
+
 
                     <!-- Mensagens de erro/alerta -->
                     <div id="msg" class="alert" role="alert"></div>

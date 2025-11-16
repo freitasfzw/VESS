@@ -153,44 +153,6 @@
             text-decoration: underline
         }
 
-        /* Switch ("Lembrar de mim") */
-        .switch {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px
-        }
-
-        .switch input {
-            display: none
-        }
-
-        .switch .track {
-            width: 46px;
-            height: 26px;
-            background: #223160;
-            border-radius: 999px;
-            position: relative;
-            transition: .25s
-        }
-
-        .switch .thumb {
-            position: absolute;
-            width: 22px;
-            height: 22px;
-            top: 2px;
-            left: 2px;
-            background: white;
-            border-radius: 50%;
-            transition: .25s
-        }
-
-        .switch input:checked+.track {
-            background: linear-gradient(135deg, var(--accent), var(--accent-2))
-        }
-
-        .switch input:checked+.track .thumb {
-            transform: translateX(20px)
-        }
 
         /* Alertas */
         .alert {
@@ -287,4 +249,47 @@
         .popup-hide {
             opacity: 0;
             transform: translateX(-50%) translateY(40px);
+        }
+
+        #togglePass {
+            position: absolute;
+            top: 50%;
+            right: 12px;
+
+            /* tamanho fixo para garantir alinhamento */
+            width: 38px;
+            height: 38px;
+
+            transform: translateY(-10%);
+            padding: 0;
+            margin: 0;
+
+            background: transparent;
+            border: none;
+            cursor: pointer;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            /* opcional: efeito suave */
+            transition: opacity .2s ease, transform .2s ease;
+        }
+
+        #togglePass svg {
+            width: 22px;
+            height: 22px;
+            pointer-events: none;
+        }
+
+        /* Remove o amarelo / branco do autofill no Chrome */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 50px #0a1533 inset !important;
+            /* mesma cor do seu input */
+            -webkit-text-fill-color: var(--text) !important;
+            caret-color: var(--text) !important;
+            transition: background-color 9999s ease-out;
         }
