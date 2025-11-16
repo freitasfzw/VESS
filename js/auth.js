@@ -27,13 +27,13 @@ import { verificarAssinatura, monitorarAssinatura, redirecionarFinanceiro } from
 // 🚀 CONFIGURAÇÃO DO FIREBASE
 // ===================================================
 const firebaseConfig = {
-    apiKey: "AIzaSyAx8gOqPVeCztlMTWUsh048ejiNaFGnmAY",
-    authDomain: "fluxo-de-caixa---base.firebaseapp.com",
-    projectId: "fluxo-de-caixa---base",
-    storageBucket: "fluxo-de-caixa---base.firebasestorage.app",
-    messagingSenderId: "525078400423",
-    appId: "1:525078400423:web:812c21c317312354123a82",
-    measurementId: "G-LN7JHSJB86"
+  apiKey: "AIzaSyAx8gOqPVeCztlMTWUsh048ejiNaFGnmAY",
+  authDomain: "fluxo-de-caixa---base.firebaseapp.com",
+  projectId: "fluxo-de-caixa---base",
+  storageBucket: "fluxo-de-caixa---base.firebasestorage.app",
+  messagingSenderId: "525078400423",
+  appId: "1:525078400423:web:812c21c317312354123a82",
+  measurementId: "G-LN7JHSJB86"
 };
 
 
@@ -148,3 +148,5 @@ export async function getUserName() {
         return user.email;
     }
 }
+
+window.db = db;

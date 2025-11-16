@@ -1,3 +1,8 @@
+import { db } from "./auth.js";
+import { loadFromFirebase, syncFirebase } from "./firebase-index.js";
+import { doc, setDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+console.log("index.js: db inicializado?", !!db, db?.constructor?.name || typeof db);
 // ===================================================
 // 📊 ATUALIZAÇÃO DE GRÁFICOS
 // ===================================================
@@ -5,6 +10,23 @@
 export function atualizarGraficos() {
     gerarRelatorio(); // ✅ só redireciona para o relatório
 }
+
+async function init() {
+    await loadFromFirebase();   // vem do firebase-index.js
+    renderTabs();
+
+    listarProdutos();
+    listarCaixa();
+    listarFechamentos();
+    atualizarGraficos();
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'F2') { e.preventDefault(); editarProduto() }
+        if (e.key === 'F9') { e.preventDefault(); $('#pos-finalizar').click() }
+    });
+}
+
+init();
 
 // ===================================================
 // 🔧 FUNÇÕES UTILITÁRIAS
@@ -100,15 +122,6 @@ $('#btnNovaVenda')?.addEventListener('click', () => { carrinho.length = 0; rende
 $('#pos-finalizar')?.addEventListener('click', () => {
     if (carrinho.length === 0) return mostrarPopup('Carrinho vazio');
 
-    if (state.cfg.controlaEstoque) {
-        for (const it of carrinho) {
-            const p = state.produtos.find(x => x.codigo === it.codigo);
-            if (!p || (p.estoque || 0) < it.qtd) {
-                return mostrarPopup(`Estoque insuficiente para "${it.nome}"`);
-            }
-        }
-    }
-
     const totalTxt = $('#pos-total').textContent.replace(/[^0-9,.-]/g, '').replace('.', '').replace(',', '.');
     const total = +totalTxt || 0;
 
@@ -130,23 +143,40 @@ $('#pos-finalizar')?.addEventListener('click', () => {
         cliente: $('#pos-cliente').value.trim()
     };
 
-    // Atualiza estoque
+    // ===================================================
+    // 🔧 DESCONTAR ESTOQUE (CORRETO)
+    // ===================================================
     if (state.cfg.controlaEstoque) {
         for (const it of venda.itens) {
-            const p = state.produtos.find(x => x.codigo === it.codigo);
-            if (p) p.estoque -= it.qtd;
+            const produto = state.produtos.find(p => p.codigo === it.codigo);
+            if (produto) {
+                produto.estoque = Math.max(0, (+produto.estoque || 0) - it.qtd);
+            }
         }
-        DB.set('produtos', state.produtos);
+
+        DB.set("produtos", state.produtos);
     }
-    // Controla estoque se habilitado
-    if (state.cfg.controlaEstoque) { for (const it of venda.itens) { const p = state.produtos.find(x => x.codigo === it.codigo); if (p) { p.estoque = Math.max(0, (+p.estoque || 0) - it.qtd) } } DB.set('produtos', state.produtos) }
+
+        (async () => {
+        await syncFirebase();
+    })();
 
     // Lançamento no caixa
     state.caixa.push({ id: uid(), data: venda.data, desc: `Venda PDV ${venda.id}`, cat: 'Vendas', entrada: venda.total, saida: 0 });
     DB.set('caixa', state.caixa);
 
-    // Guarda a venda
-    state.vendas.push(venda); DB.set('vendas', state.vendas);
+    state.vendas.push(venda);
+    DB.set("vendas", state.vendas);
+
+    // 🔥 Bloco isolado async (perfeito para scripts soltos)
+    (async () => {
+        try {
+            await setDoc(doc(db, "vendas", venda.id), venda);
+            console.log("Venda sincronizada no Firestore.");
+        } catch (e) {
+            console.error("Erro ao sincronizar venda:", e);
+        }
+    })();
 
     // Emite NF simulada se marcado
     if ($('#pos-nf').checked) gerarDanfeSimulada(venda);
@@ -679,13 +709,13 @@ const btnSalvarCfg = document.getElementById("btnSalvarCfg");
 if (btnSalvarCfg) {
     btnSalvarCfg.addEventListener("click", () => {
 
-        const nome       = document.getElementById("cfg-nome")?.value.trim() || '';
-        const cnpj       = document.getElementById("cfg-cnpj")?.value.trim() || '';
-        const ie         = document.getElementById("cfg-ie")?.value.trim() || '';
-        const endereco   = document.getElementById("cfg-endereco")?.value.trim() || '';
-        const icms       = +document.getElementById("cfg-icms")?.value || 0;
-        const iss        = +document.getElementById("cfg-iss")?.value || 0;
-        const controla   = document.getElementById("cfg-controlaEstoque")?.checked || false;
+        const nome = document.getElementById("cfg-nome")?.value.trim() || '';
+        const cnpj = document.getElementById("cfg-cnpj")?.value.trim() || '';
+        const ie = document.getElementById("cfg-ie")?.value.trim() || '';
+        const endereco = document.getElementById("cfg-endereco")?.value.trim() || '';
+        const icms = +document.getElementById("cfg-icms")?.value || 0;
+        const iss = +document.getElementById("cfg-iss")?.value || 0;
+        const controla = document.getElementById("cfg-controlaEstoque")?.checked || false;
 
         state.cfg = {
             nome,

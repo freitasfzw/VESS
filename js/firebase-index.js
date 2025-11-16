@@ -4,14 +4,6 @@
 import { DB } from "./db.js";
 import { protectPage, logout, getUserName, getUserRole, auth, db } from "./auth.js";
 protectPage();
-import {
-    selecionarAba,
-    renderTabs,
-    listarProdutos,
-    listarCaixa,
-    listarFechamentos,
-    atualizarGraficos,
-} from "./index.js";
 import { state, mostrarPopup } from "./global.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 import { collection, getDocs, doc, getDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
@@ -46,6 +38,28 @@ onAuthStateChanged(auth, async (user) => {
     }
 });
 
+// ===================================================
+// 🚪 onAuthStateChanged
+// ===================================================
+onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+        userInfoEl.textContent = "Carregando...";
+        return;
+    }
+
+    try {
+        const name = await getUserName();
+        const role = await getUserRole();
+
+        userInfoEl.textContent = `${name} - ${role}`;
+        applyPermissions(role); // aqui chamamos selecionarAba()
+
+    } catch (err) {
+        console.error(err);
+        userInfoEl.textContent = "Erro ao carregar usuário";
+    }
+});
+
 
 // ===================================================
 // 🚪 LOGOUT
@@ -74,7 +88,6 @@ function applyPermissions(role) {
 
     // Abre automaticamente a primeira aba permitida
     const primeiraVisivel = allowed[0];
-    if (primeiraVisivel) selecionarAba(primeiraVisivel);
 }
 
 
@@ -82,66 +95,37 @@ function applyPermissions(role) {
 // 🔄 SINCRONIZAÇÃO COMPLETA (LOCAL → FIREBASE)
 // ===================================================
 async function syncFirebase() {
+    console.log("syncFirebase: enviado → db:", !!db);
+
     try {
         // Produtos
-        const colProdRef = collection(db, "produtos");
-        const prodSnap = await getDocs(colProdRef);
-        const prodIds = state.produtos.map(p => p.id);
-
-        for (const docF of prodSnap.docs) {
-            if (!prodIds.includes(docF.id)) await deleteDoc(doc(db, "produtos", docF.id));
-        }
-        for (const p of state.produtos) await setDoc(doc(db, "produtos", p.id), p);
-
+        for (const p of state.produtos)
+            await setDoc(doc(db, "produtos", p.id), p);
 
         // Caixa
-        const colCxRef = collection(db, "caixa");
-        const cxSnap = await getDocs(colCxRef);
-        const cxIds = state.caixa.map(c => c.id);
-
-        for (const docF of cxSnap.docs) {
-            if (!cxIds.includes(docF.id)) await deleteDoc(doc(db, "caixa", docF.id));
-        }
-        for (const c of state.caixa) await setDoc(doc(db, "caixa", c.id), c);
-
+        for (const c of state.caixa)
+            await setDoc(doc(db, "caixa", c.id), c);
 
         // Vendas
-        const colVendasRef = collection(db, "vendas");
-        const vendasSnap = await getDocs(colVendasRef);
-        const vendasIds = state.vendas.map(v => v.id);
-
-        for (const docF of vendasSnap.docs) {
-            if (!vendasIds.includes(docF.id)) await deleteDoc(doc(db, "vendas", docF.id));
-        }
-
+        for (const v of state.vendas)
+            await setDoc(doc(db, "vendas", v.id), v);
 
         // Fechamentos
-        const colFechRef = collection(db, "fechamentos");
-        const fechSnap = await getDocs(colFechRef);
-        const fechIds = state.fechamentos.map(f => f.id);
+        for (const f of state.fechamentos)
+            await setDoc(doc(db, "fechamentos", f.id), f);
 
-        for (const docF of fechSnap.docs) {
-            if (!fechIds.includes(docF.id)) await deleteDoc(doc(db, "fechamentos", docF.id));
-        }
-        for (const f of state.fechamentos) await setDoc(doc(db, "fechamentos", f.id), f);
-
-
-        // Status do Caixa (documento único)
+        // Configurações
+        await setDoc(doc(db, "cfg", "config"), state.cfg);
         await setDoc(doc(db, "cfg", "caixaStatus"), state.caixaStatus);
 
-        // Vendas (cria/update)
-        for (const v of state.vendas) await setDoc(doc(db, "vendas", v.id), v);
-
-        // Configurações gerais
-        await setDoc(doc(db, "cfg", "config"), state.cfg);
-
-        mostrarPopup("Dados sincronizados com Firebase!");
+        mostrarPopup("Dados enviados ao Firebase!");
 
     } catch (err) {
-        console.error("Erro ao sincronizar Firebase:", err);
-        mostrarPopup("Erro ao enviar dados para Firebase");
+        console.error("Erro no syncFirebase:", err);
+        mostrarPopup("Erro ao sincronizar com Firebase");
     }
 }
+
 
 
 // ===================================================
@@ -175,46 +159,6 @@ async function loadFromFirebase() {
     }
 }
 
-
+// 🔄 EXPORTA FUNÇÕES PARA GLOBAL E MÓDULO
 // ===================================================
-// 🚀 INICIALIZAÇÃO GERAL DO SISTEMA
-// ===================================================
-async function init() {
-    renderTabs();          // Renderiza abas
-    await loadFromFirebase(); // Carrega dados antes do render
-
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            try {
-                const name = await getUserName();
-                const role = await getUserRole();
-
-                userInfoEl.textContent = `${name} - ${role}`;
-                applyPermissions(role);
-
-            } catch (err) {
-                console.error(err);
-                userInfoEl.textContent = "Erro ao carregar usuário";
-            }
-        } else {
-            userInfoEl.textContent = "Carregando...";
-        }
-    });
-
-    listarProdutos();
-    listarCaixa();
-    atualizarGraficos();
-
-    // Atalhos do sistema
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'F2') { e.preventDefault(); editarProduto() }
-        if (e.key === 'F9') { e.preventDefault(); $('#pos-finalizar').click() }
-    });
-}
-init();
-
-
-// ===================================================
-// 🔄 EXPORTA FUNÇÕES PARA GLOBAL
-// ===================================================
-window.syncFirebase = syncFirebase;
+export { syncFirebase, loadFromFirebase, db };
