@@ -1,8 +1,15 @@
 import { db } from "./auth.js";
+import { auth } from "./auth.js";
 import { loadFromFirebase, syncFirebase } from "./firebase-index.js";
 import { doc, setDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
-console.log("index.js: db inicializado?", !!db, db?.constructor?.name || typeof db);
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        init();
+    }
+});
+
 // ===================================================
 // 📊 ATUALIZAÇÃO DE GRÁFICOS
 // ===================================================
@@ -25,9 +32,6 @@ async function init() {
         if (e.key === 'F9') { e.preventDefault(); $('#pos-finalizar').click() }
     });
 }
-
-init();
-
 // ===================================================
 // 🔧 FUNÇÕES UTILITÁRIAS
 // ===================================================
@@ -92,9 +96,128 @@ export function selecionarAba(id) {
 // ===================================================
 // 📦 ESTOQUE — CRUD COMPLETO
 // ===================================================
-export function listarProdutos() { const tbody = $('#tblProdutos tbody'); const q = $('#buscaProduto').value.toLowerCase(); const cat = $('#filtroCategoria').value.toLowerCase(); tbody.innerHTML = ''; state.produtos.filter(p => (p.nome.toLowerCase().includes(q) || p.codigo.toLowerCase().includes(q) || p.categoria.toLowerCase().includes(q)) && (cat ? p.categoria.toLowerCase().includes(cat) : true)).forEach(p => { const tr = document.createElement('tr'); tr.innerHTML = `<td>${p.codigo}</td><td>${p.nome}</td><td>${p.categoria}</td><td class='right'>${fmtBRL(+p.custo || 0)}</td><td class='right'>${fmtBRL(+p.preco || 0)}</td><td class='right'>${p.estoque ?? 0}</td><td class='right'><button class='ghost' onclick="editarProduto('${p.id}')">Editar</button> <button class='danger' onclick="excluirProduto('${p.id}')">Excluir</button></td>`; tbody.appendChild(tr) }) }
+export function listarProdutos() {
+    const tbody = $('#tblProdutos tbody');
+    const q = ($('#buscaProduto')?.value || "").toLowerCase();
+    const cat = ($('#filtroCategoria')?.value || "").toLowerCase();
 
-function editarProduto(id) { const p = state.produtos.find(x => x.id === id) || { id: uid(), codigo: '', nome: '', categoria: '', estoque: 0, custo: 0, preco: 0 }; $('#p-cod').value = p.codigo; $('#p-nome').value = p.nome; $('#p-cat').value = p.categoria; $('#p-estoque').value = p.estoque; $('#p-custo').value = p.custo; $('#p-preco').value = p.preco; $('#p-salvar').onclick = (e) => { e.preventDefault(); p.codigo = $('#p-cod').value.trim(); p.nome = $('#p-nome').value.trim(); p.categoria = $('#p-cat').value.trim(); p.estoque = +$('#p-estoque').value || 0; p.custo = +$('#p-custo').value || 0; p.preco = +$('#p-preco').value || 0; const i = state.produtos.findIndex(x => x.id === p.id); if (i >= 0) state.produtos[i] = p; else state.produtos.push(p); DB.set('produtos', state.produtos); syncFirebase(); $('#dlgProduto').close(); listarProdutos(); mostrarPopup('Produto salvo!') }; $('#dlgProduto').showModal() }
+    tbody.innerHTML = '';
+
+    state.produtos
+        // 🔥 FILTRO À PROVA DE PRODUTOS CORROMPIDOS
+        .filter(p => p && typeof p === "object")
+        .filter(p => {
+            const nome = (p.nome || "").toLowerCase();
+            const codigo = (p.codigo || "").toLowerCase();
+            const categoria = (p.categoria || "").toLowerCase();
+
+            const matchBusca = (
+                nome.includes(q) ||
+                codigo.includes(q) ||
+                categoria.includes(q)
+            );
+
+            const matchCat = cat ? categoria.includes(cat) : true;
+
+            return matchBusca && matchCat;
+        })
+        .forEach(p => {
+            const tr = document.createElement('tr');
+
+            tr.innerHTML = `
+                <td>${p.codigo || '-'}</td>
+                <td>${p.nome || '-'}</td>
+                <td>${p.categoria || '-'}</td>
+                <td class='right'>${fmtBRL(+p.custo || 0)}</td>
+                <td class='right'>${fmtBRL(+p.preco || 0)}</td>
+                <td class='right'>${p.estoque ?? 0}</td>
+                <td class='right'>
+                    <button class='ghost' onclick="editarProduto('${p.id}')">Editar</button>
+                    <button class='danger' onclick="excluirProduto('${p.id}')">Excluir</button>
+                </td>
+            `;
+
+            tbody.appendChild(tr);
+        });
+}
+
+function editarProduto(id) {
+    const p = state.produtos.find(x => x.id === id) || {
+        id: uid(),
+        codigo: '',
+        nome: '',
+        categoria: '',
+        estoque: 0,
+        custo: 0,
+        preco: 0
+    };
+
+    $('#p-cod').value = p.codigo;
+    $('#p-nome').value = p.nome;
+    $('#p-cat').value = p.categoria;
+    $('#p-estoque').value = p.estoque;
+    $('#p-custo').value = p.custo;
+    $('#p-preco').value = p.preco;
+
+    $('#p-salvar').onclick = async (e) => {
+        e.preventDefault();
+
+        // Atualiza objeto com valores do formulário
+        p.codigo = $('#p-cod').value.trim();
+        p.nome = $('#p-nome').value.trim();
+        p.categoria = $('#p-cat').value.trim();
+        p.estoque = +$('#p-estoque').value || 0;
+        p.custo = +$('#p-custo').value || 0;
+        p.preco = +$('#p-preco').value || 0;
+
+        // Atualiza estado local
+        const i = state.produtos.findIndex(x => x.id === p.id);
+        if (i >= 0) state.produtos[i] = p;
+        else state.produtos.push(p);
+
+        // --- 1) SALVA NO localStorage (DB.set) COM LOG ---
+        try {
+            console.log('[DEBUG] Salvando no localStorage (DB.set) -> produtos', p);
+            DB.set('produtos', state.produtos);
+            // Verifica se gravou lendo imediatamente
+            const check = JSON.parse(localStorage.getItem('produtos'));
+            console.log('[DEBUG] localStorage agora tem produtos count =', (Array.isArray(check) ? check.length : '-'), check && check.find(x => x.id === p.id) ? 'produto presente' : 'produto ausente');
+        } catch (err) {
+            console.error('[ERRO] Não foi possível gravar no localStorage:', err);
+            mostrarPopup('Erro ao salvar localmente (veja console).');
+            return;
+        }
+
+        // --- 2) TENTA SALVAR APENAS ESSE PRODUTO NO FIRESTORE (com checks) ---
+        try {
+            // Confere usuário autenticado
+            const user = (typeof auth !== 'undefined' && auth.currentUser) ? auth.currentUser : null;
+            console.log('[DEBUG] auth.currentUser ->', user ? user.uid : user);
+
+            if (!user) {
+                console.warn('[WARN] Usuário não autenticado no momento. Salvamento no Firestore será tentado quando fizer login.');
+                mostrarPopup('Produto salvo localmente. Faça login para sincronizar com o servidor.');
+            } else {
+                // IMPORTANTE: usa setDoc direto para essa coleção 'produtos' (salva apenas este documento)
+                console.log('[DEBUG] Gravando produto no Firestore (coleção "produtos")', p.id);
+                await setDoc(doc(db, "produtos", p.id), p);
+                console.log('[OK] Produto sincronizado no Firestore:', p.id);
+                mostrarPopup('Produto salvo e sincronizado!');
+            }
+        } catch (err) {
+            console.error('[ERRO] Falha ao salvar produto no Firestore:', err);
+            mostrarPopup('Produto salvo localmente, mas falhou sincronizar com o servidor (veja console).');
+            // não retorna; deixamos a UI seguir para não interromper fluxo
+        }
+
+        // Atualiza UI e finaliza modal
+        $('#dlgProduto').close();
+        listarProdutos();
+    };
+
+    $('#dlgProduto').showModal();
+}
+
 function excluirProduto(id) { if (!confirm('Excluir produto?')) return; state.produtos = state.produtos.filter(p => p.id !== id); DB.set('produtos', state.produtos); listarProdutos(); mostrarPopup('Produto excluído') }
 
 // ===================================================
