@@ -7,7 +7,7 @@ echo =============================
 
 git add .
 git commit -m "Atualizacao automatica -- autopush.bat"
-git push
+git push --force
 
 echo =============================
 echo Concluído!
