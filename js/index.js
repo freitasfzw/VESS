@@ -11,7 +11,7 @@ onAuthStateChanged(auth, (user) => {
 });
 
 // ===================================================
-// 📊 ATUALIZAÇÃO DE GRÁFICOS
+//  ATUALIZAÇÃO DE GRÁFICOS
 // ===================================================
 
 export function atualizarGraficos() {
@@ -33,7 +33,7 @@ async function init() {
     });
 }
 // ===================================================
-// 🔧 FUNÇÕES UTILITÁRIAS
+//  FUNÇÕES UTILITÁRIAS
 // ===================================================
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -49,7 +49,7 @@ const clamp2 = n => Math.round((+n || 0) * 100) / 100;
 const toBRL = n => fmtBRL(clamp2(n));
 
 // ===================================================
-// 💾 STORAGE LOCAL (DB Wrapper)
+//  STORAGE LOCAL (DB Wrapper)
 // ===================================================
 const DB = {
     get(key, def) { try { return JSON.parse(localStorage.getItem(key)) ?? def } catch { return def } },
@@ -57,7 +57,7 @@ const DB = {
 }
 
 // ===================================================
-// 📦 ESTADO GLOBAL (STATE)
+//  ESTADO GLOBAL (STATE)
 // ===================================================
 const state = {
     produtos: DB.get('produtos', []),
@@ -69,7 +69,7 @@ const state = {
 };
 
 // ===================================================
-// 🧭 NAVEGAÇÃO / ABAS
+//  NAVEGAÇÃO / ABAS
 // ===================================================
 const abas = [
     { id: 'sec-pos', label: 'PDV' },
@@ -94,7 +94,7 @@ export function selecionarAba(id) {
 }
 
 // ===================================================
-// 📦 ESTOQUE — CRUD COMPLETO
+//  ESTOQUE — CRUD COMPLETO
 // ===================================================
 export function listarProdutos() {
     const tbody = $('#tblProdutos tbody');
@@ -218,10 +218,20 @@ function editarProduto(id) {
     $('#dlgProduto').showModal();
 }
 
-function excluirProduto(id) { if (!confirm('Excluir produto?')) return; state.produtos = state.produtos.filter(p => p.id !== id); DB.set('produtos', state.produtos); listarProdutos(); mostrarPopup('Produto excluído') }
+function excluirProduto(id) {
+    if (!confirm('Excluir produto?')) return;
+
+    state.produtos = state.produtos.filter(p => p.id !== id);
+
+    DB.set('produtos', state.produtos);
+    listarProdutos();
+    mostrarPopup('Produto excluído');
+}
+
+window.excluirProduto = excluirProduto;
 
 // ===================================================
-// 📤 IMPORTAÇÃO / EXPORTAÇÃO JSON
+//  IMPORTAÇÃO / EXPORTAÇÃO JSON
 // ===================================================
 $('#btnExportar')?.addEventListener('click', () => { const data = { produtos: state.produtos, caixa: state.caixa, vendas: state.vendas, cfg: state.cfg }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'loja-dados.json'; a.click(); URL.revokeObjectURL(a.href) });
 $('#btnImportar')?.addEventListener('click', () => { const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'application/json'; inp.onchange = () => { const f = inp.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { try { const data = JSON.parse(r.result); state.produtos = data.produtos || []; state.caixa = data.caixa || []; state.vendas = data.vendas || []; state.cfg = data.cfg || state.cfg; DB.set('produtos', state.produtos); DB.set('caixa', state.caixa); DB.set('vendas', state.vendas); DB.set('cfg', state.cfg); syncFirebase(); listarProdutos(); listarCaixa(); mostrarPopup('Dados importados!') } catch (e) { alert('Arquivo inválido') } }; r.readAsText(f) }; inp.click() });
@@ -230,7 +240,7 @@ $('#buscaProduto')?.addEventListener('input', listarProdutos);
 $('#filtroCategoria')?.addEventListener('input', listarProdutos);
 
 // ===================================================
-// 🛒 PDV / CARRINHO
+//  PDV / CARRINHO
 // ===================================================
 const carrinho = [];
 function addCarrinho(codigo, qtd) { const p = state.produtos.find(x => x.codigo === codigo); if (!p) { mostrarPopup('Produto não encontrado'); return } const item = carrinho.find(i => i.codigo === codigo); if (item) item.qtd += qtd; else carrinho.push({ codigo, nome: p.nome, preco: +p.preco || 0, qtd }); renderCarrinho() }
@@ -240,7 +250,7 @@ $('#pos-desconto')?.addEventListener('input', renderCarrinho);
 $('#btnNovaVenda')?.addEventListener('click', () => { carrinho.length = 0; renderCarrinho(); $('#pos-cliente').value = ''; $('#pos-desconto').value = 0; mostrarPopup('Carrinho limpo') })
 
 // ===================================================
-// 💸 FINALIZAÇÃO DE VENDA
+//  FINALIZAÇÃO DE VENDA
 // ===================================================
 $('#pos-finalizar')?.addEventListener('click', () => {
     if (carrinho.length === 0) return mostrarPopup('Carrinho vazio');
@@ -266,9 +276,9 @@ $('#pos-finalizar')?.addEventListener('click', () => {
         cliente: $('#pos-cliente').value.trim()
     };
 
-    // ===================================================
-    // 🔧 DESCONTAR ESTOQUE (CORRETO)
-    // ===================================================
+// ===================================================
+//  DESCONTAR ESTOQUE (CORRETO)
+// ===================================================
     if (state.cfg.controlaEstoque) {
         for (const it of venda.itens) {
             const produto = state.produtos.find(p => p.codigo === it.codigo);
@@ -284,14 +294,14 @@ $('#pos-finalizar')?.addEventListener('click', () => {
         await syncFirebase();
     })();
 
-    // Lançamento no caixa
+
     state.caixa.push({ id: uid(), data: venda.data, desc: `Venda PDV ${venda.id}`, cat: 'Vendas', entrada: venda.total, saida: 0 });
     DB.set('caixa', state.caixa);
 
     state.vendas.push(venda);
     DB.set("vendas", state.vendas);
 
-    // 🔥 Bloco isolado async (perfeito para scripts soltos)
+
     (async () => {
         try {
             await setDoc(doc(db, "vendas", venda.id), venda);
@@ -301,18 +311,18 @@ $('#pos-finalizar')?.addEventListener('click', () => {
         }
     })();
 
-    // Emite NF simulada se marcado
+
     if ($('#pos-nf').checked) gerarDanfeSimulada(venda);
 
     carrinho.length = 0; syncFirebase(); renderCarrinho(); listarProdutos(); listarCaixa(); mostrarPopup('Venda concluída!')
 })
 
 // ===================================================
-// 📷 SCANNER (QuaggaJS)
+//  SCANNER (QuaggaJS)
 // ===================================================
 let scanning = false;
 
-// Inicia o scanner
+
 function startScanner() {
     if (!window.Quagga) {
         alert('QuaggaJS não carregado');
@@ -328,7 +338,7 @@ function startScanner() {
             type: 'LiveStream',
             target: el,
             constraints: {
-                facingMode: 'environment' // câmera traseira
+                facingMode: 'environment'
             }
         },
         decoder: {
@@ -348,49 +358,44 @@ function startScanner() {
     Quagga.onDetected(handleDetection);
 }
 
-// Para o scanner
+
 function stopScanner() {
     if (window.Quagga && scanning) {
         Quagga.stop();
         scanning = false;
         document.getElementById('scanner').style.display = 'none';
         mostrarPopup('Scanner parado');
-        Quagga.offDetected(handleDetection); // remove o listener
+        Quagga.offDetected(handleDetection);
     }
 }
 
-// Função que processa a leitura do código de barras
+
 function handleDetection(data) {
     if (!scanning) return;
 
     const code = data.codeResult.code;
     document.getElementById('pos-barcode').value = code;
 
-    // Adiciona ao carrinho (com quantidade mínima de 1)
     const quantidade = Math.max(1, +document.getElementById('pos-qtd').value || 1);
     addCarrinho(code, quantidade);
 }
 
-// Event listeners para botões
 document.getElementById('btnStartScan')?.addEventListener('click', startScanner);
 document.getElementById('btnStopScan')?.addEventListener('click', stopScanner);
 
 // ===================================================
-// 💵 CAIXA (LISTAGEM + CRUD + STATUS)
+//  CAIXA (LISTAGEM + CRUD + STATUS)
 // ===================================================
 export function listarCaixa() { const tbody = $('#tblCaixa tbody'); tbody.innerHTML = ''; const ini = $('#cx-inicio').value ? new Date($('#cx-inicio').value) : null; const fim = $('#cx-fim').value ? new Date($('#cx-fim').value + 'T23:59:59') : null; let saldo = 0; state.caixa.filter(l => { const d = new Date(l.data); return (!ini || d >= ini) && (!fim || d <= fim) }).sort((a, b) => new Date(a.data) - new Date(b.data)).forEach(l => { saldo += (+l.entrada || 0) - (+l.saida || 0); const tr = document.createElement('tr'); tr.innerHTML = `<td>${new Date(l.data).toLocaleDateString()}</td><td>${l.desc}</td><td>${l.cat}</td><td class='right'>${l.entrada ? fmtBRL(+l.entrada) : ''}</td><td class='right'>${l.saida ? fmtBRL(+l.saida) : ''}</td><td class='right'><button class='danger' onclick="excluirLancamento('${l.id}')">Excluir</button></td>`; tbody.appendChild(tr) }); const elSaldo = $('#cx-saldo'); elSaldo.textContent = `Saldo: ${fmtBRL(saldo)}`; elSaldo.className = 'pill ' + (saldo > 0 ? 'status-ok' : (saldo < 0 ? 'status-danger' : 'status-warn')) }
 function excluirLancamento(id) {
     if (!confirm('Excluir lançamento?')) return;
 
-    // Encontrar o lançamento no caixa
     const lanc = state.caixa.find(x => x.id === id);
 
     if (lanc) {
-        // Remove do caixa
         state.caixa = state.caixa.filter(x => x.id !== id);
         DB.set('caixa', state.caixa);
 
-        // Verifica se é uma venda vinculada e remove
         const match = lanc.desc.match(/Venda PDV (\w+)/);
         if (match) {
             const vendaId = match[1];
@@ -406,20 +411,17 @@ function excluirLancamento(id) {
 $('#btnLancamento')?.addEventListener('click', () => { $('#l-data').valueAsDate = new Date(); $('#l-cat').value = ''; $('#l-desc').value = ''; $('#l-valor').value = ''; $('#l-tipo').value = 'E'; $('#l-salvar').onclick = (e) => { e.preventDefault(); const tipo = $('#l-tipo').value; const val = +$('#l-valor').value || 0; const obj = { id: uid(), data: ($('#l-data').value ? new Date($('#l-data').value) : new Date()).toISOString(), desc: $('#l-desc').value.trim(), cat: $('#l-cat').value.trim(), entrada: tipo === 'E' ? val : 0, saida: tipo === 'S' ? val : 0 }; state.caixa.push(obj); DB.set('caixa', state.caixa); $('#dlgLancamento').close(); listarCaixa(); mostrarPopup('Lançamento salvo') }; $('#dlgLancamento').showModal() })
 
 // ===================================================
-// 🔒 ESTADO DO CAIXA (ABERTO/FECHADO)
+//  ESTADO DO CAIXA (ABERTO/FECHADO)
 // ===================================================
 function aplicarEstadoCaixa() {
     const bloqueado = !state.caixaStatus.aberto;
-    // Botões PDV
     ['pos-add', 'pos-finalizar', 'btnStartScan', 'btnNovaVenda'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.disabled = bloqueado;
     });
-    // Sinalização visual
     const posSec = document.getElementById('sec-pos');
     if (posSec) posSec.style.opacity = bloqueado ? .6 : 1;
 
-    // Botões Fechar/Abrir
     const btnFech = document.getElementById('btnFechamento');
     const btnAbrir = document.getElementById('btnAbrirCaixa');
     if (btnFech) btnFech.style.display = bloqueado ? 'none' : 'inline-block';
@@ -427,12 +429,11 @@ function aplicarEstadoCaixa() {
 }
 
 // ===================================================
-// 📘 CÁLCULO DO FECHAMENTO DO DIA
+//  CÁLCULO DO FECHAMENTO DO DIA
 // ===================================================
 function calcularResumoDia(base = new Date()) {
     const [ini, fim] = dayBounds(base);
 
-    // Vendas do dia
     const vendasDia = state.vendas.filter(v => {
         const d = new Date(v.data);
         return d >= ini && d <= fim;
@@ -440,14 +441,12 @@ function calcularResumoDia(base = new Date()) {
 
     const totalVendas = clamp2(vendasDia.reduce((a, v) => a + (+v.total || 0), 0));
 
-    // Por forma de pagamento
     const formas = {};
     vendasDia.forEach(v => {
         formas[v.pagto] = clamp2((formas[v.pagto] || 0) + (+v.total || 0));
     });
 
-    // Itens agregados e lucro
-    const mapa = {}; // por código
+    const mapa = {};
     let lucroLiquido = 0;
     vendasDia.forEach(v => v.itens.forEach(it => {
         const k = it.codigo;
@@ -461,7 +460,6 @@ function calcularResumoDia(base = new Date()) {
     }));
     const itensAgr = Object.values(mapa).sort((a, b) => a.nome.localeCompare(b.nome));
 
-    // Lançamentos do dia (entradas/saídas)
     const movDia = state.caixa.filter(l => {
         const d = new Date(l.data);
         return d >= ini && d <= fim;
@@ -470,7 +468,6 @@ function calcularResumoDia(base = new Date()) {
     const totalSaidas = clamp2(movDia.reduce((a, l) => a + (+l.saida || 0), 0));
     const saldoDia = clamp2(totalEntradas - totalSaidas);
 
-    // Saídas detalhadas (somente >0)
     const saidasDetalhe = movDia.filter(l => +l.saida > 0);
 
     return {
@@ -488,23 +485,20 @@ function calcularResumoDia(base = new Date()) {
 }
 
 // ===================================================
-// 🗃️ FECHAMENTO — MODAL & CONFIRMAR
+//  FECHAMENTO — MODAL & CONFIRMAR
 // ===================================================
 function abrirModalFechamento(res) {
     const dlg = document.getElementById('dlgFechamentoDia');
     const box = document.getElementById('fech-resumo');
 
-    // Tabela formas de pagamento
     const formasRows = Object.keys(res.formas).map(fp =>
         `<tr><td>${fp}</td><td class="right">${toBRL(res.formas[fp])}</td></tr>`
     ).join('') || `<tr><td>—</td><td class="right">${toBRL(0)}</td></tr>`;
 
-    // Saídas do dia
     const saidasRows = res.saidasDetalhe.map(s =>
         `<tr><td>${new Date(s.data).toLocaleTimeString('pt-BR')}</td><td>${s.desc}</td><td class="right">${toBRL(s.saida)}</td></tr>`
     ).join('') || `<tr><td colspan="3" class="muted">Sem saídas</td></tr>`;
 
-    // Produtos vendidos (agregado)
     const itensRows = res.itensAgr.map(it =>
         `<tr>
       <td>${it.nome}</td>
@@ -539,7 +533,6 @@ function abrirModalFechamento(res) {
     </table>
   `;
 
-    // Sugestões iniciais
     const inpRet = document.getElementById('fech-retirar');
     const inpTrc = document.getElementById('fech-troco');
     const sugeridoTroco = clamp2(state.caixaStatus.trocoProximoDia || 0); // mantém o último como default
@@ -547,13 +540,11 @@ function abrirModalFechamento(res) {
     inpRet.value = sugeridoRetirada.toFixed(2);
     inpTrc.value = sugeridoTroco.toFixed(2);
 
-    // Bloqueia ESC / clique fora
     dlg.addEventListener('cancel', (e) => e.preventDefault(), { once: true });
     dlg.addEventListener('click', (e) => {
         if (e.target === dlg) e.preventDefault();
     });
 
-    // Confirmar fechamento
     document.getElementById('fech-confirmar').onclick = (e) => {
         e.preventDefault();
         confirmarFechamento(res);
@@ -571,7 +562,6 @@ function confirmarFechamento(res) {
 
     const agora = new Date().toISOString();
 
-    // Monta objeto fechamento (guarda tudo para histórico)
     const fechamento = {
         id: uid(),
         dataRef: res.dataRef,
@@ -591,10 +581,8 @@ function confirmarFechamento(res) {
     state.fechamentos.push(fechamento);
     DB.set('fechamentos', state.fechamentos);
 
-    // ===== LIMPA TODO o fluxo do caixa =====
     state.caixa = [];
 
-    // Atualiza status do caixa (fechado e guarda troco p/ amanhã)
     state.caixaStatus = { aberto: false, trocoProximoDia: troco, abertoEm: null, fechadoEm: agora };
     DB.set('caixaStatus', state.caixaStatus);
     DB.set('caixa', state.caixa);
@@ -608,7 +596,7 @@ function confirmarFechamento(res) {
 }
 
 // ===================================================
-// 🗃️ HISTÓRICO DE FECHAMENTOS
+//  HISTÓRICO DE FECHAMENTOS
 // ===================================================
 document.getElementById('btnFechamento')?.addEventListener('click', () => {
     if (!state.caixaStatus.aberto) return mostrarPopup('Caixa já está fechado.');
@@ -616,7 +604,6 @@ document.getElementById('btnFechamento')?.addEventListener('click', () => {
     abrirModalFechamento(resumo);
 });
 
-// Abrir Caixa para o próximo dia (injeta troco como abertura)
 document.getElementById('btnAbrirCaixa')?.addEventListener('click', () => {
     if (state.caixaStatus.aberto) return mostrarPopup('Caixa já está aberto.');
 
@@ -630,7 +617,7 @@ document.getElementById('btnAbrirCaixa')?.addEventListener('click', () => {
             entrada: valorTroco,
             saida: 0
         });
-        state.caixaStatus.trocoProximoDia = 0; // já usado
+        state.caixaStatus.trocoProximoDia = 0;
     }
 
     state.caixaStatus.aberto = true;
@@ -645,7 +632,6 @@ document.getElementById('btnAbrirCaixa')?.addEventListener('click', () => {
     mostrarPopup('Caixa aberto para o novo dia.');
 });
 
-// Inicializa estado de UI ao carregar
 aplicarEstadoCaixa();
 
 $('#cx-aplicar')?.addEventListener('click', listarCaixa);
@@ -720,7 +706,7 @@ function abrirDetalheFechamento(id) {
 }
 
 // ===================================================
-// 📊 RELATÓRIOS AVANÇADOS
+//  RELATÓRIOS AVANÇADOS
 // ===================================================
 function gerarRelatorio() {
     const inicio = $('#rel-inicio').value ? new Date($('#rel-inicio').value) : null;
@@ -736,7 +722,7 @@ function gerarRelatorio() {
         return;
     }
 
-    // --- Cálculos principais ---
+
     const totalVendas = vendas.reduce((a, v) => a + (+v.total || 0), 0);
     const qtdVendas = vendas.length;
     const lucro = vendas.reduce((a, v) =>
@@ -748,24 +734,20 @@ function gerarRelatorio() {
     const lucroMedio = lucro / qtdVendas;
     const margemLucro = (lucro / totalVendas) * 100;
 
-    // --- Produto mais vendido ---
     const produtos = {};
     vendas.forEach(v => v.itens.forEach(it => {
         produtos[it.nome] = (produtos[it.nome] || 0) + it.qtd;
     }));
     const topProduto = Object.entries(produtos).sort((a, b) => b[1] - a[1])[0];
 
-    // --- Forma de pagamento mais usada ---
     const formas = {};
     vendas.forEach(v => { formas[v.pagto] = (formas[v.pagto] || 0) + 1; });
     const topForma = Object.entries(formas).sort((a, b) => b[1] - a[1])[0];
 
-    // --- Clientes que mais gastaram ---
     const porCliente = {};
     vendas.forEach(v => { porCliente[v.cliente] = (porCliente[v.cliente] || 0) + v.total; });
     const topClientes = Object.entries(porCliente).sort((a, b) => b[1] - a[1]).slice(0, 5);
 
-    // --- Top dias ---
     const porDia = {};
     vendas.forEach(v => {
         const d = new Date(v.data).toLocaleDateString('pt-BR');
@@ -773,7 +755,6 @@ function gerarRelatorio() {
     });
     const topDias = Object.entries(porDia).sort((a, b) => b[1] - a[1]).slice(0, 5);
 
-    // --- Monta HTML com estilo ---
     $('#relatorio-container').innerHTML = `
       <div class="rel-grid">
         <div class="rel-card"><h4>Faturamento</h4><p>${toBRL(totalVendas)}</p></div>
@@ -810,7 +791,6 @@ function gerarRelatorio() {
       </div>
     `;
 
-    // Controle dos botões toggle
     document.querySelectorAll(".rel-toggle").forEach(btn => {
         btn.addEventListener("click", () => {
             const target = btn.dataset.target;
@@ -821,11 +801,10 @@ function gerarRelatorio() {
     });
 }
 
-// Botão para atualizar relatório
 $('#rel-aplicar')?.addEventListener('click', gerarRelatorio);
 
 // ===================================================
-// 💾 SALVAR CONFIGURAÇÕES
+//  SALVAR CONFIGURAÇÕES
 // ===================================================
 const btnSalvarCfg = document.getElementById("btnSalvarCfg");
 
@@ -857,7 +836,7 @@ if (btnSalvarCfg) {
 }
 
 // ===================================================
-// 🧾 DANFE (SIMULADA)
+//  DANFE (SIMULADA)
 // ===================================================
 async function gerarDanfeSimulada(venda) {
     const { jsPDF } = window.jspdf; const doc = new jsPDF(); const cfg = state.cfg; doc.setFontSize(14); doc.text(cfg.nome || 'Minha Loja', 14, 16); doc.setFontSize(10); doc.text(`CNPJ: ${cfg.cnpj || '-'}  IE: ${cfg.ie || '-'}`, 14, 22); doc.text(cfg.endereco || '', 14, 28); doc.setFontSize(12); doc.text('DANFE (Simulado) — Documento Auxiliar da NF-e', 14, 38);
