@@ -2,7 +2,7 @@ import { db } from "./auth.js";
 import { auth } from "./auth.js";
 import { mostrarPopup } from "./global.js";
 import { loadFromFirebase, syncFirebase } from "./firebase-index.js";
-import { doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+import { doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
 onAuthStateChanged(auth, (user) => {
@@ -20,7 +20,8 @@ export function atualizarGraficos() {
 }
 
 async function init() {
-    await loadFromFirebase();   // vem do firebase-index.js
+    await loadFromFirebase();
+    atualizarTituloLoja();
     renderTabs();
 
     listarProdutos();
@@ -33,6 +34,31 @@ async function init() {
         if (e.key === 'F9') { e.preventDefault(); $('#pos-finalizar').click() }
     });
 }
+
+// ===================================================
+//  ATUALIZAÇÃO DO TÍTULO DA LOJA
+// ===================================================
+
+function atualizarTituloLoja() {
+    const titulo = document.getElementById("tituloFluxo");
+    if (titulo) {
+        titulo.textContent = `Fluxo de Caixa — ${state.cfg.nome || "Minha Loja"}`;
+    }
+}
+
+onSnapshot(doc(db, "cfg", "config"), (snap) => {
+    if (snap.exists()) {
+        const dados = snap.data();
+        state.cfg.nome = dados.nome || state.cfg.nome;
+
+        DB.set("cfg", state.cfg); // mantém cache local atualizado
+
+        const titulo = document.getElementById("tituloFluxo");
+        if (titulo) {
+            titulo.textContent = `Fluxo de Caixa — ${state.cfg.nome}`;
+        }
+    }
+});
 // ===================================================
 //  FUNÇÕES UTILITÁRIAS
 // ===================================================
@@ -195,7 +221,7 @@ function editarProduto(id) {
                 mostrarPopup('Produto salvo localmente. Faça login para sincronizar com o servidor.');
             } else {
                 // IMPORTANTE: usa setDoc direto para essa coleção 'produtos' (salva apenas este documento)
-               await setDoc(doc(db, "produtos", p.id), p);
+                await setDoc(doc(db, "produtos", p.id), p);
                 mostrarPopup('Produto salvo e sincronizado!');
             }
         } catch (err) {
@@ -660,6 +686,7 @@ export function listarFechamentos() {
         btn.onclick = () => abrirDetalheFechamento(btn.dataset.det);
     });
 }
+
 
 function abrirDetalheFechamento(id) {
     const f = state.fechamentos.find(x => x.id === id);

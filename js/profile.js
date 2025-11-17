@@ -168,20 +168,25 @@ async function carregarConfiguracoes() {
 
 // 🆕 Atualizar configurações da loja
 if (btnSalvarLoja) {
+    // PROFILE.JS — salva configs da loja
     btnSalvarLoja.addEventListener("click", async () => {
         try {
             const dados = {
-                nome: lojaInputs[0]?.value || "",
-                cnpj: lojaInputs[1]?.value || "",
-                endereco: lojaInputs[2]?.value || "",
+                nome: lojaInputs[0].value || "",
+                cnpj: lojaInputs[1].value || "",
+                endereco: lojaInputs[2].value || "",
                 atualizadoEm: new Date()
             };
 
             await setDoc(doc(db, "cfg", "config"), dados, { merge: true });
+
+            // Atualiza localStorage também
+            localStorage.setItem("nomeLoja", dados.nome);
+
             mostrarPopup("Configurações da loja atualizadas!");
         } catch (err) {
-            console.error("Erro ao salvar configurações:", err);
-            alert("Erro ao salvar. Verifique o console.");
+            console.error("Erro:", err);
+            alert("Erro ao salvar.");
         }
     });
 }
@@ -802,12 +807,12 @@ function iniciarListenerVendas() {
 
     // Escuta em tempo real
     onSnapshot(ref, async () => {
-       await gerarRelatorio();  // atualiza tudo automaticamente
+        await gerarRelatorio();  // atualiza tudo automaticamente
     });
 }
 
 function gerarRelatorioComVendas(vendas) {
-    // 🔹 Aqui vamos copiar a lógica do seu relatório
+    //  Aqui vamos copiar a lógica do seu relatório
     // mas removendo o getDocs e usando as vendas recebidas
 
     const container = document.getElementById("relatorio-container");
@@ -825,7 +830,7 @@ function gerarRelatorioComVendas(vendas) {
         return (!inicio || d >= inicio) && (!fim || d <= fim);
     });
 
-    // ❗ Aqui você reutiliza TODA a lógica atual:
+    //  Aqui você reutiliza TODA a lógica atual:
     // totais, top produtos, top dias, gráficos, KPIs...
     //
     // Apenas substitua o array 'vendas' pelo array 'filtradas'
