@@ -33,10 +33,15 @@
 }
 
 body {
+    overflow: hidden;
     margin: 0;
     background: linear-gradient(180deg, var(--bg-gray-1) 0%, var(--bg-gray-2) 50%, var(--bg-gray-2) 100%);
     font-family: Inter, system-ui, Segoe UI, Roboto, Helvetica, Arial;
     color: var(--text)
+}
+
+html {
+    overflow: hidden;
 }
 
 header {
@@ -50,20 +55,20 @@ header {
 }
 
 .wrap {
-    max-width: 1200px;
+    max-width: 100%;
     margin: 0 auto;
     padding: 16px
 }
 
 .brand {
     display: flex;
-    gap: 12px;
+    gap: 32px;
     align-items: center
 }
 
 .brand .logo {
-    width: 36px;
-    height: 36px;
+    width: 52px;
+    height: 52px;
     border-radius: 10px;
     background: url("/img/IMG-Jpeg-degrade.png") center/cover no-repeat;
     box-shadow: var(--shadow);
@@ -73,12 +78,13 @@ nav {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+    justify-content: center;
     margin-top: 12px
 }
 
 .tab-btn {
     border: none;
-    padding: 10px 14px;
+    padding: 12px 24px;
     border-radius: 999px;
     background: var(--bg-gray-1);
     color: var(--muted);
@@ -503,10 +509,4 @@ body.bloqueado::after {
 /* Remove scrollbar em Firefox */
 * {
     scrollbar-width: none;
-}
-
-/* Impede scroll (se quiser remover totalmente a rolagem) */
-html,
-body {
-    overflow: hidden;
 }
