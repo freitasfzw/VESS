@@ -3,7 +3,7 @@ setlocal enabledelayedexpansion
 cd /d "%~dp0"
 
 echo ==========================================
-echo        PAINEL DE COMMIT PARA GITHUB
+echo       PAINEL DE COMMIT PARA GITHUB
 echo ==========================================
 
 set /p title="Título do commit: "
