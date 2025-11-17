@@ -3,12 +3,14 @@
    ========================================================= */
 :root {
     --bg: #0d0620;
-    --bg-dark-purple: #0a0318;
+    --bg-dark-purple: #160229;
     --bg-purple: #380f8f;
+    --bg-dark: #444444;
 
     --bg-gray-1: #444444;
     /* cinza profissional */
     --bg-gray-2: #2b2b2b;
+    --bg-gray-3: #535353;
     /* cinza escuro neutro */
 
     --card: #1a1133;
@@ -294,8 +296,10 @@ button.ghost {
     display: flex;
     height: 100vh;
     width: 100vw;
-    position: relative; /* necessário */
-    overflow: hidden;   /* para o efeito não vazar */
+    position: relative;
+    /* necessário */
+    overflow: hidden;
+    /* para o efeito não vazar */
 }
 
 
@@ -303,17 +307,21 @@ button.ghost {
 
 .login-left {
     flex: 1;
-    background: linear-gradient(
-        to right,
-        rgba(13, 6, 32, 1) 0%,      /* fundo roxo profundo */
-        rgba(20, 10, 45, 1) 35%,    /* suavização */
-        rgba(26, 17, 51, 0.9) 60%,  /* aproxima do painel */
-        rgba(26, 17, 51, 0.0) 100%  /* dissolve na borda */
-    );
+    background: linear-gradient(to right,
+            rgba(13, 6, 32, 1) 0%,
+            /* fundo roxo profundo */
+            rgba(20, 10, 45, 1) 35%,
+            /* suavização */
+            rgba(26, 17, 51, 0.9) 60%,
+            /* aproxima do painel */
+            rgba(26, 17, 51, 0.0) 100%
+            /* dissolve na borda */
+        );
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 260px;               /* ✔ mantido */
+    padding: 260px;
+    /* ✔ mantido */
     overflow: hidden;
     position: relative;
 }
@@ -324,15 +332,14 @@ button.ghost {
     top: 0;
     right: 0;
     height: 100%;
-    width: 240px; /* largura do degradê – ajustável */
+    width: 240px;
+    /* largura do degradê – ajustável */
 
-    background: linear-gradient(
-        to right,
-        rgba(26, 17, 51, 0) 0%,
-        rgba(26, 17, 51, 0.3) 40%,
-        rgba(26, 17, 51, 0.75) 75%,
-        rgba(26, 17, 51, 1) 100%
-    );
+    background: linear-gradient(to right,
+            rgba(26, 17, 51, 0) 0%,
+            rgba(26, 17, 51, 0.3) 40%,
+            rgba(26, 17, 51, 0.75) 75%,
+            rgba(26, 17, 51, 1) 100%);
 
     pointer-events: none;
 }
