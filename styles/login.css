@@ -294,21 +294,52 @@ button.ghost {
     display: flex;
     height: 100vh;
     width: 100vw;
+    position: relative; /* necessário */
+    overflow: hidden;   /* para o efeito não vazar */
 }
+
+
+
 
 .login-left {
     flex: 1;
-    background: var(--card);
+    background: linear-gradient(
+        to right,
+        rgba(13, 6, 32, 1) 0%,      /* fundo roxo profundo */
+        rgba(20, 10, 45, 1) 35%,    /* suavização */
+        rgba(26, 17, 51, 0.9) 60%,  /* aproxima do painel */
+        rgba(26, 17, 51, 0.0) 100%  /* dissolve na borda */
+    );
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 160px;
+    padding: 260px;               /* ✔ mantido */
     overflow: hidden;
+    position: relative;
+}
+
+.login-left::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 240px; /* largura do degradê – ajustável */
+
+    background: linear-gradient(
+        to right,
+        rgba(26, 17, 51, 0) 0%,
+        rgba(26, 17, 51, 0.3) 40%,
+        rgba(26, 17, 51, 0.75) 75%,
+        rgba(26, 17, 51, 1) 100%
+    );
+
+    pointer-events: none;
 }
 
 .login-left img {
-    max-width: 1200px;
-    max-height: 920px;
+    max-width: 1280px;
+    max-height: 980px;
     opacity: .9;
     animation: floatzoom 8s ease-in-out infinite;
 }
@@ -319,7 +350,9 @@ button.ghost {
     align-items: center;
     justify-content: center;
     padding: 40px;
+    position: relative;
 }
+
 
 /* Responsivo */
 @media (max-width: 900px) {
