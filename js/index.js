@@ -50,6 +50,8 @@ onSnapshot(doc(db, "cfg", "config"), (snap) => {
     if (snap.exists()) {
         const dados = snap.data();
         state.cfg.nome = dados.nome || state.cfg.nome;
+        state.cfg.instagram = dados.instagram || state.cfg.instagram; // ← ESSA LINHA
+
 
         DB.set("cfg", state.cfg); // mantém cache local atualizado
 
@@ -353,7 +355,7 @@ $('#pos-finalizar')?.addEventListener('click', () => {
     })();
 
 
-    if ($('#pos-nf').checked) gerarDanfeSimulada(venda);
+    if ($('#pos-nf').checked) gerarReciboVenda(venda);
 
     carrinho.length = 0; syncFirebase(); renderCarrinho(); listarProdutos(); listarCaixa(); mostrarPopup('Venda concluída!')
 })
@@ -785,15 +787,178 @@ function abrirDetalheFechamento(id) {
 }
 
 
-// ===================================================
-//  DANFE (SIMULADA)
-// ===================================================
-async function gerarDanfeSimulada(venda) {
-    const { jsPDF } = window.jspdf; const doc = new jsPDF(); const cfg = state.cfg; doc.setFontSize(14); doc.text(cfg.nome || 'Minha Loja', 14, 16); doc.setFontSize(10); doc.text(`CNPJ: ${cfg.cnpj || '-'}  IE: ${cfg.ie || '-'}`, 14, 22); doc.text(cfg.endereco || '', 14, 28); doc.setFontSize(12); doc.text('DANFE (Simulado) — Documento Auxiliar da NF-e', 14, 38);
-    doc.setFontSize(10); doc.text(`Data: ${new Date(venda.data).toLocaleString('pt-BR')}`, 14, 46); doc.text(`Cliente: ${venda.cliente || '-'}`, 14, 52); doc.text(`Pagamento: ${venda.pagto}`, 14, 58);
-    const body = venda.itens.map((it, i) => { return [(i + 1).toString(), it.codigo, it.nome, it.qtd.toString(), it.preco.toFixed(2), (it.qtd * it.preco).toFixed(2)] });
-    doc.autoTable({ startY: 64, head: [['#', 'Cód.', 'Produto', 'Qtd', 'Preço', 'Subtotal']], body });
-    const total = venda.total; const base = total; const icms = base * ((+cfg.icms || 0) / 100); const iss = base * ((+cfg.iss || 0) / 100);
-    const y = doc.autoTable.previous.finalY + 8; doc.text(`Base de Cálculo: R$ ${base.toFixed(2)}`, 14, y); doc.text(`ICMS (${(+cfg.icms || 0).toFixed(2)}%): R$ ${icms.toFixed(2)}`, 14, y + 6); doc.text(`ISS (${(+cfg.iss || 0).toFixed(2)}%): R$ ${iss.toFixed(2)}`, 14, y + 12); doc.setFontSize(12); doc.text(`TOTAL: R$ ${total.toFixed(2)}`, 150, y + 12);
-    doc.save(`DANFE_${venda.id}.pdf`)
+// ==========================================================
+// QR CODE (Instagram da Loja)
+// ==========================================================
+function gerarQRCodeBase64(texto) {
+    const canvas = document.createElement("canvas");
+
+    new QRious({
+        element: canvas,
+        value: texto,
+        size: 140,
+        level: "H"
+    });
+
+    return canvas.toDataURL("image/png");
 }
+
+// ==========================================================
+// RECIBO PREMIUM COM QR CODE
+// ==========================================================
+async function gerarReciboVenda(venda) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: "mm", format: "a4" });
+
+    const cfg = state.cfg;
+    let y = 14;
+
+    // ===== TÍTULO =====
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text("RECIBO DE VENDA", 105, y, { align: "center" });
+    y += 12;
+
+    doc.setLineWidth(0.6);
+    doc.line(10, y, 200, y);
+    y += 6;
+
+    // ===== DADOS DA LOJA =====
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text(cfg.nome || "Minha Loja", 10, y);
+    y += 6;
+
+    doc.setFont("helvetica", "normal");
+    doc.text(`CNPJ: ${cfg.cnpj || "-"}`, 10, y);
+    y += 6;
+
+    if (cfg.endereco) {
+        doc.text(cfg.endereco, 10, y);
+        y += 8;
+    }
+
+    // ===== INFO DA VENDA =====
+    doc.setLineWidth(0.4);
+    doc.line(10, y, 200, y);
+    y += 7;
+
+    doc.setFont("helvetica", "bold");
+    doc.text("DATA:", 10, y);
+    doc.setFont("helvetica", "normal");
+    doc.text(new Date(venda.data).toLocaleString('pt-BR'), 35, y);
+    y += 6;
+
+    doc.setFont("helvetica", "bold");
+    doc.text("CLIENTE:", 10, y);
+    doc.setFont("helvetica", "normal");
+    doc.text(venda.cliente || "Não informado", 35, y);
+    y += 6;
+
+    doc.setFont("helvetica", "bold");
+    doc.text("PAGAMENTO:", 10, y);
+    doc.setFont("helvetica", "normal");
+    doc.text(venda.pagto, 40, y);
+    y += 10;
+
+    doc.line(10, y, 200, y);
+    y += 7;
+
+    // ===== LISTAGEM DE ITENS =====
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13);
+    doc.text("Itens da Compra:", 10, y);
+    y += 8;
+
+    doc.setFontSize(11);
+
+    venda.itens.forEach(it => {
+        const sub = it.preco * it.qtd;
+
+        // Nome do produto
+        doc.setFont("helvetica", "bold");
+        doc.text(it.nome, 10, y);
+        y += 5;
+
+        doc.setFont("helvetica", "normal");
+        doc.text(`Qtd: ${it.qtd}`, 12, y);
+        doc.text(`Preço: ${toBRL(it.preco)}`, 60, y);
+        doc.text(`Subtotal: ${toBRL(sub)}`, 140, y);
+        y += 8;
+
+        // separador
+        doc.setDrawColor(180, 180, 180);
+        doc.setLineWidth(0.2);
+        doc.line(10, y, 200, y);
+        y += 4;
+    });
+
+    y += 4;
+
+    // ===== RESUMO FINAL =====
+    const subtotal = venda.itens.reduce((acc, it) => acc + it.preco * it.qtd, 0);
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.text("Subtotal:", 130, y);
+    doc.setFont("helvetica", "normal");
+    doc.text(toBRL(subtotal), 200, y, { align: "right" });
+    y += 6;
+
+    doc.setFont("helvetica", "bold");
+    doc.text("Desconto:", 130, y);
+    doc.setFont("helvetica", "normal");
+    doc.text(toBRL(venda.desconto || 0), 200, y, { align: "right" });
+    y += 8;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(15);
+    doc.text("TOTAL:", 130, y);
+    doc.text(toBRL(venda.total), 200, y, { align: "right" });
+    y += 14;
+
+    doc.setLineWidth(0.5);
+    doc.line(10, y, 200, y);
+    y += 16;
+
+    // ==========================================================
+    // 📌  QR CODE DO INSTAGRAM — AGORA NO LUGAR CORRETO
+    // ==========================================================
+
+    const instaURL =
+        cfg.instagram &&
+            cfg.instagram.trim() &&
+            cfg.instagram.trim().length > 3
+            ? cfg.instagram.trim()
+            : "https://instagram.com/seuinsta";
+
+    const qrBase64 = gerarQRCodeBase64(instaURL);
+
+    // Centralizado
+    doc.addImage(qrBase64, "PNG", 105 - 20, y, 40, 40);
+    y += 46;
+
+    // Texto abaixo
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.text("Siga-nos no Instagram:", 105, y, { align: "center" });
+    y += 6;
+
+    doc.setFont("helvetica", "normal");
+    doc.text(instaURL, 105, y, { align: "center" });
+    y += 12;
+
+    // ===== RODAPÉ =====
+    doc.setFontSize(11);
+    doc.text("Obrigado pela preferência!", 10, y);
+    y += 6;
+
+    doc.setFontSize(9);
+    doc.setTextColor(120);
+    doc.text("Gerado com VESS — Vision Enterprise Software Solutions", 10, y);
+
+    // FINALIZAÇÃO — AGORA SIM
+    doc.save(`Recibo_${venda.id}.pdf`);
+}
+
+

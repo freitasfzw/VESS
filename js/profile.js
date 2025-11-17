@@ -152,8 +152,9 @@ async function carregarConfiguracoes() {
             lojaInputs[0].value = dados.nome || "";
             lojaInputs[1].value = dados.cnpj || "";
             lojaInputs[2].value = dados.endereco || "";
+            lojaInputs[3].value = dados.instagram || "";   // 🆕 INSTAGRAM
 
-            // 🆕 Atualiza o nome da loja na navbar (brand)
+            // Atualiza o nome da loja na navbar
             const brandTitle = document.querySelector(".brand h2");
             if (brandTitle) {
                 brandTitle.textContent = dados.nome || "Minha Loja";
@@ -168,13 +169,13 @@ async function carregarConfiguracoes() {
 
 // 🆕 Atualizar configurações da loja
 if (btnSalvarLoja) {
-    // PROFILE.JS — salva configs da loja
     btnSalvarLoja.addEventListener("click", async () => {
         try {
             const dados = {
                 nome: lojaInputs[0].value || "",
                 cnpj: lojaInputs[1].value || "",
                 endereco: lojaInputs[2].value || "",
+                instagram: lojaInputs[3].value || "",  // 🆕 SALVA INSTAGRAM
                 atualizadoEm: new Date()
             };
 
@@ -182,6 +183,7 @@ if (btnSalvarLoja) {
 
             // Atualiza localStorage também
             localStorage.setItem("nomeLoja", dados.nome);
+            localStorage.setItem("instagramLoja", dados.instagram); // 🆕 OPCIONAL
 
             mostrarPopup("Configurações da loja atualizadas!");
         } catch (err) {
@@ -191,32 +193,22 @@ if (btnSalvarLoja) {
     });
 }
 
-// 🔹 Logout
-if (btnLogout) {
-    btnLogout.addEventListener("click", () => {
-        localStorage.clear();
-        logout();
-    });
-}
-
 // 🔄 Atualização automática das configurações da loja (tempo real)
 onSnapshot(doc(db, "cfg", "config"), (snap) => {
     if (snap.exists()) {
         const dados = snap.data();
 
-        // Atualiza inputs visíveis
         lojaInputs[0].value = dados.nome || "";
         lojaInputs[1].value = dados.cnpj || "";
         lojaInputs[2].value = dados.endereco || "";
+        lojaInputs[3].value = dados.instagram || "";   // 🆕 ATUALIZA INPUT
 
-        // Atualiza título da loja no header
         const brandTitle = document.querySelector(".brand h2");
         if (brandTitle) {
             brandTitle.textContent = dados.nome || "Minha Loja";
         }
     }
 });
-
 // =====================================================
 // 🧭 NAVEGAÇÃO SPA SEGURA
 // =====================================================
