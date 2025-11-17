@@ -16,7 +16,7 @@ onAuthStateChanged(auth, (user) => {
 // ===================================================
 
 export function atualizarGraficos() {
-    gerarRelatorio(); // ✅ só redireciona para o relatório
+
 }
 
 async function init() {
@@ -101,7 +101,6 @@ const abas = [
     { id: 'sec-pos', label: 'PDV' },
     { id: 'sec-estoque', label: 'Estoque' },
     { id: 'sec-caixa', label: 'Fluxo de Caixa' },
-    { id: 'sec-relatorios', label: 'Relatórios' },
     { id: 'sec-fechamentos', label: 'Fechamentos' },
 ];
 export function renderTabs() { const nav = $('#tabs'); nav.innerHTML = ''; abas.forEach(a => { const b = document.createElement('button'); b.className = 'tab-btn'; b.textContent = a.label; b.dataset.target = a.id; b.onclick = () => selecionarAba(a.id); nav.appendChild(b) }); selecionarAba('sec-pos') }
@@ -113,7 +112,6 @@ export function selecionarAba(id) {
     sec.style.display = 'block'; // mostra apenas a ativa
     $$('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.target === id));
 
-    if (id === 'sec-relatorios') atualizarGraficos();
     if (id === 'sec-fechamentos') listarFechamentos();
     if (id === 'sec-caixa') listarCaixa();
     if (id === 'sec-estoque') listarProdutos();
@@ -287,6 +285,7 @@ $('#pos-finalizar')?.addEventListener('click', () => {
 
     const totalTxt = $('#pos-total').textContent.replace(/[^0-9,.-]/g, '').replace('.', '').replace(',', '.');
     const total = +totalTxt || 0;
+    const desconto = +$('#pos-desconto').value || 0;
 
     const itensEnriquecidos = carrinho.map(i => {
         const pRef = state.produtos.find(x => x.codigo === i.codigo);
@@ -301,10 +300,24 @@ $('#pos-finalizar')?.addEventListener('click', () => {
         id: uid(),
         data: new Date().toISOString(),
         itens: itensEnriquecidos,
-        total,
+        total,       // total já tem desconto embutido
+        desconto,    // salvar desconto explicitamente
         pagto: $('#pos-pagto').value,
         cliente: $('#pos-cliente').value.trim()
     };
+
+    // custo total dos itens
+    const custoTotal = itensEnriquecidos.reduce((acc, it) =>
+        acc + (it.custo * it.qtd)
+        , 0);
+
+    // lucro líquido correto
+    const lucroLiquido = total - custoTotal;
+
+    // anexa dentro da venda
+    venda.custoTotal = custoTotal;
+    venda.lucro = lucroLiquido;
+
 
     // ===================================================
     //  DESCONTAR ESTOQUE (CORRETO)
@@ -462,36 +475,72 @@ function aplicarEstadoCaixa() {
 function calcularResumoDia(base = new Date()) {
     const [ini, fim] = dayBounds(base);
 
+    // FILTRAR VENDAS DO DIA
     const vendasDia = state.vendas.filter(v => {
         const d = new Date(v.data);
         return d >= ini && d <= fim;
     });
 
-    const totalVendas = clamp2(vendasDia.reduce((a, v) => a + (+v.total || 0), 0));
+    // FATURAMENTO DO DIA
+    const totalVendas = clamp2(
+        vendasDia.reduce((a, v) => a + (+v.total || 0), 0)
+    );
 
+    // LUCRO LÍQUIDO DO DIA (corrigido!!)
+    let lucroLiquido = 0;
     const formas = {};
+
     vendasDia.forEach(v => {
-        formas[v.pagto] = clamp2((formas[v.pagto] || 0) + (+v.total || 0));
+        // custo total real da venda
+        const custo = v.itens.reduce((acc, it) =>
+            acc + ((it.custo || 0) * it.qtd)
+            , 0);
+
+        const lucroVenda = (v.total || 0) - custo;
+
+        lucroLiquido = clamp2(lucroLiquido + lucroVenda);
+
+        // soma formas de pagamento
+        formas[v.pagto] = clamp2(
+            (formas[v.pagto] || 0) + (+v.total || 0)
+        );
     });
 
+    // PRODUTOS AGRUPADOS
     const mapa = {};
-    let lucroLiquido = 0;
+
     vendasDia.forEach(v => v.itens.forEach(it => {
         const k = it.codigo;
-        if (!mapa[k]) mapa[k] = { codigo: k, nome: it.nome, categoria: it.categoria || '—', qtd: 0, custoTotal: 0, vendaTotal: 0, lucroTotal: 0 };
+
+        if (!mapa[k]) {
+            mapa[k] = {
+                codigo: k,
+                nome: it.nome,
+                categoria: it.categoria || "—",
+                qtd: 0,
+                custoTotal: 0,
+                vendaTotal: 0,
+                lucroTotal: 0,
+            };
+        }
+
         mapa[k].qtd += it.qtd;
-        mapa[k].custoTotal = clamp2(mapa[k].custoTotal + (it.custo || 0) * it.qtd);
-        mapa[k].vendaTotal = clamp2(mapa[k].vendaTotal + (it.preco || 0) * it.qtd);
-        const lucroItem = ((it.preco || 0) - (it.custo || 0)) * it.qtd;
-        mapa[k].lucroTotal = clamp2(mapa[k].lucroTotal + lucroItem);
-        lucroLiquido = clamp2(lucroLiquido + lucroItem);
+        mapa[k].custoTotal = clamp2(mapa[k].custoTotal + ((it.custo || 0) * it.qtd));
+        mapa[k].vendaTotal = clamp2(mapa[k].vendaTotal + ((it.preco || 0) * it.qtd));
+
+        mapa[k].lucroTotal = clamp2(
+            mapa[k].vendaTotal - mapa[k].custoTotal
+        );
     }));
+
     const itensAgr = Object.values(mapa).sort((a, b) => a.nome.localeCompare(b.nome));
 
+    // MOVIMENTO DO CAIXA
     const movDia = state.caixa.filter(l => {
         const d = new Date(l.data);
         return d >= ini && d <= fim;
     });
+
     const totalEntradas = clamp2(movDia.reduce((a, l) => a + (+l.entrada || 0), 0));
     const totalSaidas = clamp2(movDia.reduce((a, l) => a + (+l.saida || 0), 0));
     const saldoDia = clamp2(totalEntradas - totalSaidas);
@@ -507,10 +556,11 @@ function calcularResumoDia(base = new Date()) {
         totalEntradas,
         totalSaidas,
         saldoDia,
-        lucroLiquido,
+        lucroLiquido, // AGORA SIM o valor CORRETO
         saidasDetalhe
     };
 }
+
 
 // ===================================================
 //  FECHAMENTO — MODAL & CONFIRMAR
@@ -734,135 +784,6 @@ function abrirDetalheFechamento(id) {
     dlg.showModal();
 }
 
-// ===================================================
-//  RELATÓRIOS AVANÇADOS
-// ===================================================
-function gerarRelatorio() {
-    const inicio = $('#rel-inicio').value ? new Date($('#rel-inicio').value) : null;
-    const fim = $('#rel-fim').value ? new Date($('#rel-fim').value + "T23:59:59") : null;
-
-    const vendas = state.vendas.filter(v => {
-        const d = new Date(v.data);
-        return (!inicio || d >= inicio) && (!fim || d <= fim);
-    });
-
-    if (vendas.length === 0) {
-        $('#relatorio-container').innerHTML = "<p>Nenhuma venda neste período.</p>";
-        return;
-    }
-
-
-    const totalVendas = vendas.reduce((a, v) => a + (+v.total || 0), 0);
-    const qtdVendas = vendas.length;
-    const lucro = vendas.reduce((a, v) =>
-        a + v.itens.reduce((s, it) => s + ((it.preco - it.custo) * it.qtd), 0)
-        , 0);
-
-    const clientes = [...new Set(vendas.map(v => v.cliente))].length;
-    const ticketMedio = totalVendas / qtdVendas;
-    const lucroMedio = lucro / qtdVendas;
-    const margemLucro = (lucro / totalVendas) * 100;
-
-    const produtos = {};
-    vendas.forEach(v => v.itens.forEach(it => {
-        produtos[it.nome] = (produtos[it.nome] || 0) + it.qtd;
-    }));
-    const topProduto = Object.entries(produtos).sort((a, b) => b[1] - a[1])[0];
-
-    const formas = {};
-    vendas.forEach(v => { formas[v.pagto] = (formas[v.pagto] || 0) + 1; });
-    const topForma = Object.entries(formas).sort((a, b) => b[1] - a[1])[0];
-
-    const porCliente = {};
-    vendas.forEach(v => { porCliente[v.cliente] = (porCliente[v.cliente] || 0) + v.total; });
-    const topClientes = Object.entries(porCliente).sort((a, b) => b[1] - a[1]).slice(0, 5);
-
-    const porDia = {};
-    vendas.forEach(v => {
-        const d = new Date(v.data).toLocaleDateString('pt-BR');
-        porDia[d] = (porDia[d] || 0) + v.total;
-    });
-    const topDias = Object.entries(porDia).sort((a, b) => b[1] - a[1]).slice(0, 5);
-
-    $('#relatorio-container').innerHTML = `
-      <div class="rel-grid">
-        <div class="rel-card"><h4>Faturamento</h4><p>${toBRL(totalVendas)}</p></div>
-        <div class="rel-card"><h4>Lucro líquido</h4><p>${toBRL(lucro)}</p></div>
-        <div class="rel-card"><h4>Ticket médio</h4><p>${toBRL(ticketMedio)}</p></div>
-        <div class="rel-card"><h4>Vendas</h4><p>${qtdVendas}</p></div>
-        <div class="rel-card"><h4>Clientes únicos</h4><p>${clientes}</p></div>
-        <div class="rel-card"><h4>Lucro/venda</h4><p>${toBRL(lucroMedio)}</p></div>
-        <div class="rel-card"><h4>Margem</h4><p>${margemLucro.toFixed(1)}%</p></div>
-      </div>
-
-      <div>
-        <button class="rel-toggle active" data-target="destaques">Destaques</button>
-        <button class="rel-toggle active" data-target="clientes">Top Clientes</button>
-        <button class="rel-toggle active" data-target="dias">Top Dias</button>
-      </div>
-
-      <div id="rel-destaques" class="rel-list">
-        <h3>📌 Destaques</h3>
-        <ul>
-          <li>Produto mais vendido: <b>${topProduto ? topProduto[0] + " (" + topProduto[1] + " un)" : "—"}</b></li>
-          <li>Forma de pagamento mais usada: <b>${topForma ? topForma[0] + " (" + topForma[1] + ")" : "—"}</b></li>
-        </ul>
-      </div>
-
-      <div id="rel-clientes" class="rel-list">
-        <h3>🏆 Top 5 Clientes</h3>
-        <ol>${topClientes.map(c => `<li>${c[0]} - ${toBRL(c[1])}</li>`).join("")}</ol>
-      </div>
-
-      <div id="rel-dias" class="rel-list">
-        <h3>📅 Top 5 Dias</h3>
-        <ol>${topDias.map(d => `<li>${d[0]} - ${toBRL(d[1])}</li>`).join("")}</ol>
-      </div>
-    `;
-
-    document.querySelectorAll(".rel-toggle").forEach(btn => {
-        btn.addEventListener("click", () => {
-            const target = btn.dataset.target;
-            const section = document.getElementById("rel-" + target);
-            btn.classList.toggle("active");
-            section.style.display = section.style.display === "none" ? "block" : "none";
-        });
-    });
-}
-
-$('#rel-aplicar')?.addEventListener('click', gerarRelatorio);
-
-// ===================================================
-//  SALVAR CONFIGURAÇÕES
-// ===================================================
-const btnSalvarCfg = document.getElementById("btnSalvarCfg");
-
-if (btnSalvarCfg) {
-    btnSalvarCfg.addEventListener("click", () => {
-
-        const nome = document.getElementById("cfg-nome")?.value.trim() || '';
-        const cnpj = document.getElementById("cfg-cnpj")?.value.trim() || '';
-        const ie = document.getElementById("cfg-ie")?.value.trim() || '';
-        const endereco = document.getElementById("cfg-endereco")?.value.trim() || '';
-        const icms = +document.getElementById("cfg-icms")?.value || 0;
-        const iss = +document.getElementById("cfg-iss")?.value || 0;
-        const controla = document.getElementById("cfg-controlaEstoque")?.checked || false;
-
-        state.cfg = {
-            nome,
-            cnpj,
-            ie,
-            endereco,
-            icms,
-            iss,
-            controlaEstoque: controla
-        };
-
-        DB.set("cfg", state.cfg);
-        syncFirebase();
-        mostrarPopup("Configurações salvas!");
-    });
-}
 
 // ===================================================
 //  DANFE (SIMULADA)
