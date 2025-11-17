@@ -19,74 +19,83 @@
 </head>
 
 <body>
-    <main class="center">
+    <div class="login-layout">
 
-        <!-- Painel de Login -->
-        <section class="card" aria-label="Painel de Login">
+        <!-- LADO ESQUERDO (IMAGEM) -->
+        <div class="login-left">
+            <img src="img/IMG-Chatgpt.png" alt="Banner">
+        </div>
 
-            <!-- Cabeçalho com logo e título -->
-            <div class="card-header">
-                <div class="brand">
-                    <div class="logo" aria-hidden="true"></div>
-                    <div>
-                        <h2>Entrar no Painel</h2>
-                        <div class="muted">Acesso restrito — use seu e-mail corporativo</div>
-                    </div>
-                </div>
-            </div>
+        <!-- LADO DIREITO (FORMULÁRIO) -->
+        <div class="login-right">
+            <main class="center">
 
-            <!-- Formulário principal -->
-            <div class="card-content">
-                <form id="formLogin" novalidate>
+                <!-- Painel de Login -->
+                <section class="card" aria-label="Painel de Login">
 
-                    <!-- Campo de e-mail -->
-                    <label for="email">E-mail</label>
-                    <input id="email" name="email" type="email" placeholder="ex.: usuario@empresa.com"
-                        autocomplete="username" required />
-
-                    <!-- Campo de senha + botão mostrar/ocultar -->
-                    <label for="senha">Senha</label>
-                    <div style="position:relative">
-                        <input id="senha" name="senha" type="password" placeholder="••••••••"
-                            autocomplete="current-password" required />
-                        <button type="button" id="togglePass" class="ghost" aria-label="Mostrar/ocultar senha"
-                            style="position:absolute;right:6px;top:6px;padding:8px 10px">
-                            <svg id="iconPass" width="22" height="22" viewBox="0 0 24 24" fill="none">
-                                <path
-                                    d="M12 5C7 5 2.73 8.11 1 12C2.73 15.89 7 19 12 19C17 19 21.27 15.89 23 12C21.27 8.11 17 5 12 5Z"
-                                    stroke="#3A86FF" stroke-width="2" />
-                                <circle cx="12" cy="12" r="3" stroke="#3A86FF" stroke-width="2" />
-                            </svg>
-                        </button>
+                    <!-- Cabeçalho com logo e título -->
+                    <div class="card-header">
+                        <div class="brand">
+                            <div>
+                                <h2>VESS</h2>
+                                <h3>Vision Enterprise Software Solutions</h3>
+                            </div>
+                        </div>
                     </div>
 
+                    <!-- Formulário principal -->
+                    <div class="card-content">
+                        <form id="formLogin" novalidate>
 
+                            <!-- Campo de e-mail -->
+                            <label for="email">E-mail</label>
+                            <input id="email" name="email" type="email" placeholder="ex.: usuario@empresa.com"
+                                autocomplete="username" required />
+                            <!-- Campo de senha + botão mostrar/ocultar -->
+                            <label for="senha">Senha</label>
+                            <div style="position:relative">
+                                <input id="senha" name="senha" type="password" placeholder="••••••••"
+                                    autocomplete="current-password" required />
 
-                    <!-- Mensagens de erro/alerta -->
-                    <div id="msg" class="alert" role="alert"></div>
+                                <button type="button" id="togglePass" class="pass-btn"
+                                    aria-label="Mostrar/ocultar senha">
+                                    <svg id="iconPass" viewBox="0 0 24 24" fill="none">
+                                        <path
+                                            d="M12 5C7 5 2.73 8.11 1 12C2.73 15.89 7 19 12 19C17 19 21.27 15.89 23 12C21.27 8.11 17 5 12 5Z" />
+                                        <circle cx="12" cy="12" r="3" />
+                                    </svg>
+                                </button>
+                                </button>
+                            </div>
 
-                    <!-- Botão de envio -->
-                    <button id="btnEntrar" class="full" type="submit" style="margin-top:14px">
-                        Entrar
-                    </button>
+                            <!-- Mensagens de erro -->
+                            <div id="msg" class="alert" role="alert"></div>
+                            <br>
+                            <!-- Botão -->
+                            <button id="btnEntrar" class="full" type="submit" style="margin-top:14px">
+                                Entrar
+                            </button>
 
-                    <!-- Aviso e link de contato -->
-                    <div class="hint">
-                        <strong>Alerta:</strong> Entre em <a href="https://instagram.com/" style="color: inherit;"
-                            target="_blank"><b>Contato</b></a> conosco para receber acesso ao Painel.
+                            <div class="hint">
+                                <strong>Alerta:</strong> Entre em
+                                <a href="https://instagram.com/" style="color: inherit;"
+                                    target="_blank"><b>Contato</b></a>
+                                conosco para receber acesso ao Painel.
+                            </div>
+                        </form>
                     </div>
-                </form>
-            </div>
 
-            <!-- Rodapé do cartão -->
-            <div class="foot">
-                <span class="small">© <span id="year"></span> Fz Gestor</span>
-                <span class="small">Suporte: TI interno</span>
-            </div>
-        </section>
-    </main>
+                    <!-- Rodapé -->
+                    <div class="foot">
+                        <span class="small">© <span id="year"></span> - VESS</span>
+                        <span class="small">Suporte: TI interno</span>
+                    </div>
+                </section>
 
-    <!-- Script de login -->
+            </main>
+        </div>
+    </div>
+
     <script type="module" src="js/login.js"></script>
 </body>
 
