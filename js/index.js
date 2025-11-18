@@ -633,7 +633,7 @@ function abrirModalFechamento(res) {
     dlg.showModal();
 }
 
-function confirmarFechamento(res) {
+async function confirmarFechamento(res) {
     const dlg = document.getElementById('dlgFechamentoDia');
     const retirar = clamp2($('#fech-retirar').value);
     const troco = clamp2($('#fech-troco').value);
@@ -658,8 +658,16 @@ function confirmarFechamento(res) {
         vendasIds: res.vendasDia.map(v => v.id)
     };
 
+    // SALVA LOCAL
     state.fechamentos.push(fechamento);
     DB.set('fechamentos', state.fechamentos);
+
+    // SALVA NA FIRESTORE (IMEDIATO)
+    try {
+        await setDoc(doc(db, "fechamentos", fechamento.id), fechamento);
+    } catch (err) {
+        console.error("Erro ao salvar fechamento no Firestore:", err);
+    }
 
     state.caixa = [];
 
