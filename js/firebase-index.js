@@ -64,11 +64,10 @@ onAuthStateChanged(auth, async (user) => {
 // ===================================================
 // 🚪 LOGOUT
 // ===================================================
-btnLogout.addEventListener("click", () => {
-    localStorage.clear();   // limpa sessão local
-    logout();               // executa logout do Firebase
+const btnPerfil = document.getElementById("userPanel");
+btnPerfil?.addEventListener("click", () => {
+    window.location.href = "profile.html";
 });
-
 
 // ===================================================
 // 🛡️ PERMISSÕES / VISIBILIDADE DE ABAS
