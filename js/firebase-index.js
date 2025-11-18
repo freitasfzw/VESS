@@ -12,8 +12,6 @@ import { collection, getDocs, doc, getDoc, setDoc, deleteDoc } from "https://www
 const $$ = (selector) => document.querySelectorAll(selector);
 
 const userInfoEl = document.getElementById("userInfo");
-const btnLogout = document.getElementById("btnLogout");
-
 
 // ===================================================
 // 🔐 VERIFICAÇÃO DE LOGIN / GUARDA DE PÁGINA

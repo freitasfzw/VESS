@@ -33,7 +33,20 @@ protectPage();
 
 // 🎯 Elementos da interface
 const userInfoEl = document.getElementById("userInfo");
-const btnLogout = document.getElementById("btnLogout");
+document.addEventListener("DOMContentLoaded", () => {
+    const btnLogout = document.getElementById("btnLogout");
+    if (btnLogout) {
+        btnLogout.addEventListener("click", async () => {
+            try {
+                await logout();      // função oficial do sistema
+                localStorage.clear(); // limpa dados locais
+                window.location.href = "login.html";
+            } catch (err) {
+                console.error("Erro ao deslogar:", err);
+            }
+        });
+    }
+});
 
 // Campos do perfil de usuário
 const inputNome = document.querySelector('.card input[type="text"]');
@@ -441,7 +454,7 @@ async function gerarRelatorio() {
                         left: "center",
                         top: 5,
                         textStyle: {
-                            color: "#333",
+                            color: "#ffffff",
                             fontWeight: "600",
                             fontSize: 14
                         }
@@ -534,7 +547,7 @@ async function gerarRelatorio() {
                             }
                         }
                     },
-                    color: '#333',
+                    color: '#ffffff',
                     fontWeight: '600'
                 }
             },
@@ -543,14 +556,14 @@ async function gerarRelatorio() {
             xAxis: {
                 type: 'category',
                 data: topDias.map(d => d[0]),
-                axisLabel: { rotate: 45, color: '#555' },
-                axisLine: { lineStyle: { color: '#ccc' } }
+                axisLabel: { rotate: 45, color: '#ffffffff' },
+                axisLine: { lineStyle: { color: '#ffffffff' } }
             },
             yAxis: {
                 type: 'value',
                 name: 'R$',
-                axisLine: { lineStyle: { color: '#ccc' } },
-                splitLine: { lineStyle: { color: '#eee' } }
+                axisLine: { lineStyle: { color: '#ffffffff' } },
+                splitLine: { lineStyle: { color: '#ffffffff' } }
             },
             series: [{
                 data: topDias.map(d => d[1]),
@@ -558,13 +571,13 @@ async function gerarRelatorio() {
                 smooth: true,
                 symbol: 'circle',
                 symbolSize: 8,
-                lineStyle: { width: 3, color: '#3a86ff' },
-                itemStyle: { color: '#3a86ff' },
+                lineStyle: { width: 3, color: '#E100FF' },
+                itemStyle: { color: '#E100FF' },
                 areaStyle: {
                     // 🔹 Degradê linear no ângulo 135°
                     color: new echarts.graphic.LinearGradient(0, 0, 1, 1, [
-                        { offset: 0, color: 'rgba(58, 134, 255, 0.8)' }, // topo - azul forte
-                        { offset: 1, color: 'rgba(0, 180, 216, 0.2)' }   // base - azul claro transparente
+                        { offset: 0, color: 'rgba(209, 58, 255, 0.8)' }, // topo - azul forte
+                        { offset: 1, color: 'rgba(180, 0, 216, 0.2)' }   // base - azul claro transparente
                     ])
                 }
             }]
@@ -572,6 +585,7 @@ async function gerarRelatorio() {
 
         // 💳 2. Formas de Pagamento (pizza)
         const pagtoChart = echarts.init(document.getElementById('chart-pagamentos'));
+
         pagtoChart.setOption({
             title: {
                 text: '{icon|} Formas de Pagamento',
@@ -580,27 +594,55 @@ async function gerarRelatorio() {
                     rich: {
                         icon: {
                             height: 24,
-                            backgroundColor: {
-                                image: 'img/pie-chart.png' // caminho da sua imagem
-                            }
+                            backgroundColor: { image: 'img/pie-chart.png' }
                         }
                     },
-                    color: '#333',
+                    color: '#ffffff',
                     fontWeight: '900'
                 }
             },
-            tooltip: { trigger: 'item' },
-            legend: { bottom: 0 },
+
+            tooltip: {
+                trigger: 'item',
+                textStyle: {
+                    color: '#ffffff'
+                },
+                backgroundColor: 'rgba(0,0,0,0.8)',
+                borderColor: '#ffffff'
+            },
+
+            legend: {
+                bottom: 0,
+                textStyle: {
+                    color: '#ffffff' // <<< deixa a legenda branca
+                }
+            },
+
             series: [{
                 name: 'Pagamentos',
                 type: 'pie',
                 radius: '60%',
                 data: Object.entries(formas).map(([k, v]) => ({ name: k, value: v })),
+
+                label: {
+                    color: '#ffffff',        // <<< textos dentro da pizza
+                    fontWeight: '600'
+                },
+
+                labelLine: {
+                    lineStyle: {
+                        color: '#ffffff'     // <<< linha que aponta pro label
+                    }
+                },
+
                 emphasis: {
                     itemStyle: {
                         shadowBlur: 10,
                         shadowOffsetX: 0,
                         shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    },
+                    label: {
+                        color: '#ffffff'     // <<< mantém branco quando selecionado
                     }
                 }
             }]
@@ -621,7 +663,7 @@ async function gerarRelatorio() {
                             }
                         }
                     },
-                    color: '#333',
+                    color: '#ffffffff',
                     fontWeight: '600'
                 }
             },
@@ -630,14 +672,14 @@ async function gerarRelatorio() {
             xAxis: {
                 type: 'category',
                 data: ['Faturamento', 'Lucro'],
-                axisLabel: { color: '#555' },
-                axisLine: { lineStyle: { color: '#ccc' } }
+                axisLabel: { color: '#ffffffff' },
+                axisLine: { lineStyle: { color: '#ffffffff' } }
             },
             yAxis: {
                 type: 'value',
                 name: 'R$',
-                axisLine: { lineStyle: { color: '#ccc' } },
-                splitLine: { lineStyle: { color: '#eee' } }
+                axisLine: { lineStyle: { color: '#ffffffff' } },
+                splitLine: { lineStyle: { color: '#ffffffff' } }
             },
             series: [{
                 data: [totalVendas, lucro],
@@ -646,17 +688,17 @@ async function gerarRelatorio() {
                 itemStyle: {
                     borderRadius: [6, 6, 0, 0],
                     color: new echarts.graphic.LinearGradient(0, 0, 1, 1, [
-                        { offset: 0, color: '#3a86ff' },  // azul forte
-                        { offset: 1, color: '#00b4d8' }   // azul claro
+                        { offset: 0, color: '#E100FF' },  // azul forte
+                        { offset: 1, color: '#7700ff' }   // azul claro
                     ])
                 },
                 emphasis: {
                     itemStyle: {
                         shadowBlur: 20,
-                        shadowColor: 'rgba(0, 180, 216, 0.4)',
+                        shadowColor: 'rgba(137, 0, 216, 0.4)',
                         color: new echarts.graphic.LinearGradient(0, 0, 1, 1, [
-                            { offset: 0, color: '#4895ef' },
-                            { offset: 1, color: '#00b4d8' }
+                            { offset: 0, color: '#E100FF' },
+                            { offset: 1, color: '#7700ff' }
                         ])
                     }
                 }
