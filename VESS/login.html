@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Titulo da Página -->
+    <title>Entrar — Painel da Loja</title>
+    <!-- Otimiza conexão com Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <!-- Otimiza conexão com servidor de fontes -->
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Importa a fonte Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Estilos da página de login -->
+    <link rel="stylesheet" href="styles/login.css">
+    <!-- Ícone da aba -->
+    <link rel="icon" type="image/png" href="img/IMG-Png-removebg-preview.png" />
+</head>
+
+<body>
+    <div class="login-layout">
+
+        <!-- LADO ESQUERDO (IMAGEM) -->
+        <div class="login-left">
+            <img src="img/IMG-Chatgpt.png" alt="Banner">
+        </div>
+
+        <!-- LADO DIREITO (FORMULÁRIO) -->
+        <div class="login-right">
+            <main class="center">
+
+                <!-- Painel de Login -->
+                <section class="card" aria-label="Painel de Login">
+
+                    <!-- Cabeçalho com logo e título -->
+                    <div class="card-header">
+                        <div class="brand">
+                            <div>
+                                <h2>VESS</h2>
+                                <h3>Vision Enterprise Software Solutions</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Formulário principal -->
+                    <div class="card-content">
+                        <form id="formLogin" novalidate>
+
+                            <!-- Campo de e-mail -->
+                            <label for="email">E-mail</label>
+                            <input id="email" name="email" type="email" placeholder="ex.: usuario@empresa.com"
+                                autocomplete="username" required />
+                            <!-- Campo de senha + botão mostrar/ocultar -->
+                            <label for="senha">Senha</label>
+                            <div style="position:relative">
+                                <input id="senha" name="senha" type="password" placeholder="••••••••"
+                                    autocomplete="current-password" required />
+
+                                <button type="button" id="togglePass" class="pass-btn"
+                                    aria-label="Mostrar/ocultar senha">
+                                    <svg id="iconPass" viewBox="0 0 24 24" fill="none">
+                                        <path
+                                            d="M12 5C7 5 2.73 8.11 1 12C2.73 15.89 7 19 12 19C17 19 21.27 15.89 23 12C21.27 8.11 17 5 12 5Z" />
+                                        <circle cx="12" cy="12" r="3" />
+                                    </svg>
+                                </button>
+                                </button>
+                            </div>
+
+                            <!-- Mensagens de erro -->
+                            <div id="msg" class="alert" role="alert"></div>
+                            <br>
+                            <!-- Botão -->
+                            <button id="btnEntrar" class="full" type="submit" style="margin-top:14px">
+                                Entrar
+                            </button>
+
+                            <div class="hint">
+                                <strong>Alerta:</strong> Entre em
+                                <a href="https://www.instagram.com/vess.tecnologias" style="color: inherit;"
+                                    target="_blank"><b>Contato</b></a>
+                                conosco para receber acesso ao Painel.
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Rodapé -->
+                    <div class="foot">
+                        <span class="small">© <span id="year"></span> - VESS</span>
+                        <span class="small">Suporte: <a href="https://www.instagram.com/vess.tecnologias" style="color: inherit;"
+                                    target="_blank"><b>Instagram</b></a></span>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <script type="module" src="js/login.js"></script>
+</body>
+
+</html>
