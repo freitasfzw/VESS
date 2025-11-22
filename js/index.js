@@ -1,15 +1,9 @@
 import { db } from "./auth.js";
 import { auth } from "./auth.js";
-import { mostrarPopup } from "./global.js";
+import { state, mostrarPopup } from "./global.js";
 import { loadFromFirebase, syncFirebase } from "./firebase-index.js";
 import { doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        init();
-    }
-});
 
 // ===================================================
 //  ATUALIZAÇÃO DE GRÁFICOS
@@ -20,20 +14,15 @@ export function atualizarGraficos() {
 }
 
 async function init() {
-    await loadFromFirebase();
     atualizarTituloLoja();
     renderTabs();
-
     listarProdutos();
     listarCaixa();
     listarFechamentos();
     atualizarGraficos();
-
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'F2') { e.preventDefault(); editarProduto() }
-        if (e.key === 'F9') { e.preventDefault(); $('#pos-finalizar').click() }
-    });
 }
+
+
 
 // ===================================================
 //  ATUALIZAÇÃO DO TÍTULO DA LOJA
@@ -84,17 +73,6 @@ const DB = {
     set(key, val) { localStorage.setItem(key, JSON.stringify(val)) }
 }
 
-// ===================================================
-//  ESTADO GLOBAL (STATE)
-// ===================================================
-const state = {
-    produtos: DB.get('produtos', []),
-    caixa: DB.get('caixa', []),
-    vendas: DB.get('vendas', []),
-    cfg: DB.get('cfg', { nome: 'Minha Loja', cnpj: '', ie: '', endereco: '', icms: 0, iss: 0, controlaEstoque: true }),
-    fechamentos: DB.get('fechamentos', []), // histórico de fechamentos
-    caixaStatus: DB.get('caixaStatus', { aberto: true, trocoProximoDia: 0, abertoEm: null, fechadoEm: null })
-};
 
 // ===================================================
 //  NAVEGAÇÃO / ABAS
@@ -282,83 +260,93 @@ $('#btnNovaVenda')?.addEventListener('click', () => { carrinho.length = 0; rende
 // ===================================================
 //  FINALIZAÇÃO DE VENDA
 // ===================================================
-$('#pos-finalizar')?.addEventListener('click', () => {
-    if (carrinho.length === 0) return mostrarPopup('Carrinho vazio');
+$('#pos-finalizar')?.addEventListener('click', async () => {
+    try {
+        if (carrinho.length === 0) return mostrarPopup('Carrinho vazio');
 
-    const totalTxt = $('#pos-total').textContent.replace(/[^0-9,.-]/g, '').replace('.', '').replace(',', '.');
-    const total = +totalTxt || 0;
-    const desconto = +$('#pos-desconto').value || 0;
+        const totalTxt = $('#pos-total').textContent.replace(/[^0-9,.-]/g, '').replace('.', '').replace(',', '.');
+        const total = +totalTxt || 0;
+        const desconto = +$('#pos-desconto').value || 0;
 
-    const itensEnriquecidos = carrinho.map(i => {
-        const pRef = state.produtos.find(x => x.codigo === i.codigo);
-        return {
-            ...i,
-            custo: pRef ? (+pRef.custo || 0) : 0,
-            categoria: pRef ? (pRef.categoria || '—') : '—'
+        const itensEnriquecidos = carrinho.map(i => {
+            const pRef = state.produtos.find(x => x.codigo === i.codigo);
+            return {
+                ...i,
+                custo: pRef ? (+pRef.custo || 0) : 0,
+                categoria: pRef ? (pRef.categoria || '—') : '—'
+            };
+        });
+
+        const venda = {
+            id: uid(),
+            data: new Date().toISOString(),
+            itens: itensEnriquecidos,
+            total,       // total já tem desconto embutido
+            desconto,    // salvar desconto explicitamente
+            pagto: $('#pos-pagto').value,
+            cliente: $('#pos-cliente').value.trim()
         };
-    });
 
-    const venda = {
-        id: uid(),
-        data: new Date().toISOString(),
-        itens: itensEnriquecidos,
-        total,       // total já tem desconto embutido
-        desconto,    // salvar desconto explicitamente
-        pagto: $('#pos-pagto').value,
-        cliente: $('#pos-cliente').value.trim()
-    };
+        // custo total dos itens
+        const custoTotal = itensEnriquecidos.reduce((acc, it) =>
+            acc + (it.custo * it.qtd)
+            , 0);
 
-    // custo total dos itens
-    const custoTotal = itensEnriquecidos.reduce((acc, it) =>
-        acc + (it.custo * it.qtd)
-        , 0);
+        // lucro líquido correto
+        const lucroLiquido = total - custoTotal;
 
-    // lucro líquido correto
-    const lucroLiquido = total - custoTotal;
-
-    // anexa dentro da venda
-    venda.custoTotal = custoTotal;
-    venda.lucro = lucroLiquido;
+        // anexa dentro da venda
+        venda.custoTotal = custoTotal;
+        venda.lucro = lucroLiquido;
 
 
-    // ===================================================
-    //  DESCONTAR ESTOQUE (CORRETO)
-    // ===================================================
-    if (state.cfg.controlaEstoque) {
-        for (const it of venda.itens) {
-            const produto = state.produtos.find(p => p.codigo === it.codigo);
-            if (produto) {
-                produto.estoque = Math.max(0, (+produto.estoque || 0) - it.qtd);
+        // ===================================================
+        //  DESCONTAR ESTOQUE (CORRETO)
+        // ===================================================
+        if (state.cfg.controlaEstoque) {
+            for (const it of venda.itens) {
+                const produto = state.produtos.find(p => p.codigo === it.codigo);
+                if (produto) {
+                    produto.estoque = Math.max(0, (+produto.estoque || 0) - it.qtd);
+                }
             }
+            DB.set("produtos", state.produtos);
         }
 
-        DB.set("produtos", state.produtos);
-    }
+        // Salva venda no state e local DB
+        state.caixa.push({ id: uid(), data: venda.data, desc: `Venda PDV ${venda.id}`, cat: 'Vendas', entrada: venda.total, saida: 0 });
+        DB.set('caixa', state.caixa);
 
-    (async () => {
-        await syncFirebase();
-    })();
+        state.vendas.push(venda);
+        DB.set("vendas", state.vendas);
 
-
-    state.caixa.push({ id: uid(), data: venda.data, desc: `Venda PDV ${venda.id}`, cat: 'Vendas', entrada: venda.total, saida: 0 });
-    DB.set('caixa', state.caixa);
-
-    state.vendas.push(venda);
-    DB.set("vendas", state.vendas);
-
-
-    (async () => {
+        // SALVA NO FIRESTORE (aguarda o término e reporta erro)
         try {
             await setDoc(doc(db, "vendas", venda.id), venda);
-        } catch (e) {
+        } catch (err) {
+            console.error("[ERRO] Falha ao salvar venda (setDoc):", err);
+            mostrarPopup("Venda salva localmente. Falha ao sincronizar com servidor.");
         }
-    })();
 
+        // SINCRONIZA PRODUTOS / CAIXA / VENDAS -> aguardar explicitamente
+        try {
+            await syncFirebase();
+        } catch (err) {
+            console.error("[ERRO] Falha em syncFirebase após venda:", err);
+            mostrarPopup("Atualização local concluída. Falha ao sincronizar com o servidor.");
+        }
 
-    if ($('#pos-nf').checked) gerarReciboVenda(venda);
+        if ($('#pos-nf').checked) gerarReciboVenda(venda);
 
-    carrinho.length = 0; syncFirebase(); renderCarrinho(); listarProdutos(); listarCaixa(); mostrarPopup('Venda concluída!')
-})
+        // limpa carrinho e re-renderiza
+        carrinho.length = 0;
+        renderCarrinho();
+        mostrarPopup("Venda finalizada!");
+    } catch (err) {
+        console.error("[ERRO] Finalizar venda:", err);
+        mostrarPopup("Erro ao finalizar venda. Veja console.");
+    }
+});
 
 // ===================================================
 //  SCANNER (QuaggaJS)
@@ -970,3 +958,5 @@ async function gerarReciboVenda(venda) {
 }
 
 
+// Expor init para firebase-index.js
+window.init = init;
